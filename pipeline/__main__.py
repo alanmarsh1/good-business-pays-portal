@@ -1,4 +1,5 @@
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -12,6 +13,7 @@ def main():
     parser.add_argument("--export", required=True, help="Path to payment practices export CSV")
     parser.add_argument("--output", default="site", help="Output directory (default: site/)")
     parser.add_argument("--baseline", default="data/baseline.json", help="Row-count baseline JSON")
+    parser.add_argument("--ch-cache", default="data/ch_cache.json", help="Companies House cache JSON")
     parser.add_argument("--save-baseline", action="store_true", help="Update baseline after a successful run")
     parser.add_argument("--build-date", help="Override build date (YYYY-MM-DD)")
     args = parser.parse_args()
@@ -19,10 +21,18 @@ def main():
     export_path = Path(args.export)
     output_path = Path(args.output)
     baseline_path = Path(args.baseline)
+    ch_path = Path(args.ch_cache)
 
     if not export_path.exists():
         print(f"ERROR: Export file not found: {export_path}", file=sys.stderr)
         sys.exit(1)
+
+    ch_data: dict | None = None
+    if ch_path.exists():
+        ch_data = json.loads(ch_path.read_text())
+        print(f"Companies House cache: {len(ch_data):,} entries from {ch_path}")
+    else:
+        print(f"No CH cache found at {ch_path} — pages will show without sector/status data")
 
     print(f"Loading {export_path} …")
     df = load_export(export_path)
@@ -38,7 +48,7 @@ def main():
     print("  Validation passed.")
 
     print("Processing …")
-    companies, search_index = process_export(df)
+    companies, search_index = process_export(df, ch_data=ch_data)
     print(f"  {len(companies):,} companies")
 
     print(f"Building site → {output_path} …")

@@ -28,6 +28,8 @@
       <h1 class="page-heading__title">{{ c.company_name }}</h1>
       <p class="page-heading__meta">
         Company {{ c.company_number -}}
+        {%- if c.ch and c.ch.sector %} · {{ c.ch.sector }}{% endif -%}
+        {%- if c.ch and c.ch.locality %} · {{ c.ch.locality }}{% endif -%}
         {% if r.end_date %} · Period ending {{ r.end_date | fmt_date }}{% endif -%}
         {% if r.filing_date %} · Filed {{ r.filing_date | fmt_date }}{% endif %}
       </p>
@@ -37,6 +39,14 @@
       </p>
       {% endif %}
     </div>
+
+    {# ── Status warning for dissolved / in-administration companies ── #}
+    {% if c.ch and c.ch.status and c.ch.status != 'active' %}
+    <div class="notice notice--warn">
+      Companies House shows this company as <strong>{{ c.ch.status | replace('-', ' ') | title }}</strong>.
+      Payment data shown is from the last filed report.
+    </div>
+    {% endif %}
 
     {# ── 3. Company details ── #}
     <section class="section" aria-labelledby="details-h">
@@ -54,6 +64,18 @@
         <div class="detail-list__item">
           <dt>Reporting regime</dt>
           <dd>{{ r.regime }}</dd>
+        </div>
+        {% endif %}
+        {% if c.ch and c.ch.sic_codes %}
+        <div class="detail-list__item">
+          <dt>SIC codes</dt>
+          <dd>{{ c.ch.sic_codes | join(', ') }}</dd>
+        </div>
+        {% endif %}
+        {% if c.ch and c.ch.previous_names %}
+        <div class="detail-list__item">
+          <dt>Previously</dt>
+          <dd>{{ c.ch.previous_names | join('; ') }}</dd>
         </div>
         {% endif %}
       </dl>

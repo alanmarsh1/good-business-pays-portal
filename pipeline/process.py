@@ -1,10 +1,23 @@
+import json
 import math
 from datetime import date as date_type
+from pathlib import Path
 import pandas as pd
 from .config import (
     BENCHMARK_AVG_DAYS, BENCHMARK_PCT_LATE, BENCHMARK_SCALE_MAX,
     KNOWN_PAYMENT_CODES, MAX_AVG_DAYS,
 )
+
+_SIC_PATH = Path(__file__).parent.parent / "data" / "sic_sections.json"
+_SIC_SECTIONS: dict[str, str] = json.loads(_SIC_PATH.read_text()) if _SIC_PATH.exists() else {}
+
+
+def _sic_to_sector(sic_codes: list[str]) -> str | None:
+    for code in sic_codes or []:
+        prefix = str(code).strip()[:2]
+        if prefix in _SIC_SECTIONS:
+            return _SIC_SECTIONS[prefix]
+    return None
 
 
 def _normalise_number(val: str) -> str:
@@ -89,7 +102,7 @@ def _row_to_period(row) -> dict:
     }
 
 
-def process_export(df: pd.DataFrame) -> tuple[dict, list]:
+def process_export(df: pd.DataFrame, ch_data: dict | None = None) -> tuple[dict, list]:
     df = df.copy()
 
     df["company_number"] = df["Company number"].apply(_normalise_number)
@@ -200,10 +213,23 @@ def process_export(df: pd.DataFrame) -> tuple[dict, list]:
             "trend": trend,
         }
 
+        ch = (ch_data or {}).get(company_number) or {}
+        sector = _sic_to_sector(ch.get("sic_codes") or [])
+        companies[company_number]["ch"] = {
+            "status": ch.get("status"),
+            "sic_codes": ch.get("sic_codes") or [],
+            "sector": sector,
+            "locality": ch.get("locality"),
+            "region": ch.get("region"),
+            "country": ch.get("country"),
+            "previous_names": ch.get("previous_names") or [],
+        }
+
         search_index.append({
             "n": company_number,
             "name": latest["company_name"],
             "end": latest_end,
+            "sector": sector,
         })
 
     return companies, search_index

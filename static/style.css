@@ -253,6 +253,7 @@ a:hover { text-decoration: none; }
   margin-bottom: 2rem;
 }
 .notice--info { background: var(--surface); border-color: var(--signal); }
+.notice--warn { background: #FFFBEB; border-color: #D97706; color: #78350F; }
 
 /* ── Stat callouts ── */
 .stat-callouts {

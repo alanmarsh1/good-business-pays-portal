@@ -1,5 +1,5 @@
 /* Client-side search over the pre-built INDEX array.
-   Each entry: {n: "00519500", name: "Tesco Stores Limited", end: "2026-08-30"} */
+   Each entry: {n: "00519500", name: "Tesco Stores Limited", end: "2026-08-30", sector: "..."} */
 
 (function () {
   var input   = document.getElementById('search-input');
@@ -79,6 +79,7 @@
         + '<span class="results-list__name">' + esc(item.name) + '</span>'
         + '<span class="results-list__meta">'
         + esc(item.n)
+        + (item.sector ? ' &middot; ' + esc(item.sector) : '')
         + (item.end ? ' &middot; period ending ' + fmtDate(item.end) : '')
         + '</span>'
         + '</a></li>';

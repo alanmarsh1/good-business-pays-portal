@@ -40,10 +40,11 @@ jobs:
 
       - name: Validate and build
         run: |
-          python -m pipeline \
+          python3 -m pipeline \
             --export data/export.csv \
             --output site \
             --baseline data/baseline.json \
+            --ch-cache data/ch_cache.json \
             --save-baseline
 
       - name: Check site output
