@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Search — Good Business Pays{% endblock %}
+
+{% block body %}
+<header class="site-header site-header--home">
+  <div class="container site-header__inner">
+    <a href="/" class="site-logo" aria-label="Good Business Pays home">
+      <img src="/static/logo.svg" alt="Good Business Pays" width="200" height="48">
+    </a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="/about/">About the data</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="search-hero">
+    <div class="container search-hero__inner">
+      <h1 class="search-hero__title">How quickly do companies pay?</h1>
+      <p class="search-hero__subtitle">Search the official UK payment practices reporting data</p>
+      <form class="search-field" role="search" id="search-form" autocomplete="off">
+        <label class="sr-only" for="search-input">Search by company name or number</label>
+        <input
+          class="search-field__input"
+          id="search-input"
+          type="search"
+          placeholder="Company name or number…"
+          aria-label="Search by company name or number"
+          spellcheck="false"
+        >
+        <button class="search-field__btn btn" type="submit">Search</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="search-results" id="search-results" aria-live="polite" aria-label="Search results">
+    <div class="container">
+      <div id="results-inner"></div>
+    </div>
+  </section>
+
+  <section class="about-strip">
+    <div class="container about-strip__inner">
+      <p>Data from the <a href="https://check-payment-practices.service.gov.uk/" rel="noopener">UK government payment practices register</a>.
+      Updated monthly. <a href="/about/">About the data</a>.</p>
+      <p class="about-strip__date">Last updated: {{ build_date }}</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <a href="/" class="site-logo site-logo--sm" aria-label="Good Business Pays home">
+      <img src="/static/logo.svg" alt="Good Business Pays" width="120" height="29">
+    </a>
+    <p>Data under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="noopener">Open Government Licence v3.0</a></p>
+  </div>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const INDEX = {{ search_index_json | safe }};
+</script>
+<script src="/static/search.js"></script>
+{% endblock %}

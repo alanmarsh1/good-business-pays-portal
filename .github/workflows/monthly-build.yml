@@ -1,0 +1,83 @@
+name: Monthly build and deploy
+
+on:
+  schedule:
+    # 06:00 UTC on the 7th of each month (after CH snapshot is published)
+    - cron: '0 6 7 * *'
+  workflow_dispatch:
+    inputs:
+      export_url:
+        description: 'Override export URL (leave blank for default)'
+        required: false
+        default: ''
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download payment practices export
+        env:
+          EXPORT_URL: ${{ github.event.inputs.export_url || 'https://check-payment-practices.service.gov.uk/download/all-reports/csv' }}
+        run: |
+          echo "Downloading export from $EXPORT_URL"
+          curl -fsSL --retry 3 --retry-delay 10 \
+            -H 'User-Agent: GoodBusinessPays-portal/1.0' \
+            -o data/export.csv "$EXPORT_URL"
+          wc -l data/export.csv
+
+      - name: Validate and build
+        run: |
+          python -m pipeline \
+            --export data/export.csv \
+            --output site \
+            --baseline data/baseline.json \
+            --save-baseline
+
+      - name: Check site output
+        run: |
+          echo "Site files:"
+          find site -name "*.html" | wc -l
+          echo "Company pages:"
+          find site/company -mindepth 1 -maxdepth 1 -type d | wc -l
+          echo "Search page size:"
+          wc -c site/index.html
+          # Spot-check Tesco
+          if [ -f site/company/00519500/index.html ]; then
+            echo "✓ Tesco page exists"
+            grep -q "117091\|2026-08-30\|GSCOP" site/company/00519500/index.html \
+              && echo "✓ Tesco has report 117091 / GSCOP" \
+              || echo "✗ Tesco page missing expected content"
+          else
+            echo "✗ Tesco page missing"
+            exit 1
+          fi
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: good-business-pays
+          directory: site
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Save run log
+        if: always()
+        run: |
+          mkdir -p logs
+          echo "Build completed: $(date -u)" >> logs/run.log
+          find site/company -mindepth 1 -maxdepth 1 -type d | wc -l | \
+            xargs -I{} echo "  {} company pages" >> logs/run.log

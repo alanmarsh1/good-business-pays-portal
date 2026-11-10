@@ -1,0 +1,14 @@
+site/
+logs/
+*.pyc
+__pycache__/
+.env
+*.csv
+*.zip
+data/companies/
+data/search_index.json
+data/ch_snapshot/
+data/baseline.json
+.DS_Store
+venv/
+.venv/

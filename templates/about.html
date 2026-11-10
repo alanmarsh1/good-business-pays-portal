@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}About the data — Good Business Pays{% endblock %}
+
+{% block body %}
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="/" class="site-logo" aria-label="Good Business Pays home">
+      <img src="/static/logo.svg" alt="Good Business Pays" width="200" height="48">
+    </a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="/about/" aria-current="page">About the data</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="container container--narrow">
+    <div class="page-heading">
+      <h1 class="page-heading__title">About the data</h1>
+      <p class="page-heading__meta">Last updated: {{ build_date }} · {{ company_count | default(0) | int }} companies</p>
+    </div>
+
+    <section class="prose-section">
+      <h2>Data sources</h2>
+      <p>This portal uses two free public data sources:</p>
+      <dl class="detail-list">
+        <dt>UK payment practices export</dt>
+        <dd>Every report filed since April 2017, covering {{ company_count | default(0) | int }} companies.
+        Published by the Department for Business and Trade at
+        <a href="https://check-payment-practices.service.gov.uk/" rel="noopener">check-payment-practices.service.gov.uk</a>.
+        Updated when new reports are filed.</dd>
+        <dt>Companies House free data product</dt>
+        <dd>Registered address, SIC codes, previous names and company status.
+        Published by Companies House at
+        <a href="https://download.companieshouse.gov.uk/en_output.html" rel="noopener">download.companieshouse.gov.uk</a>.
+        Published monthly within 5 working days of month end.</dd>
+      </dl>
+    </section>
+
+    <section class="prose-section">
+      <h2>Processing rules</h2>
+      <p>All rules are applied consistently every month. Every figure on a company page can be traced to the export.</p>
+      <dl class="detail-list detail-list--rules">
+        <dt>Validation</dt>
+        <dd>The pipeline stops if the export is missing any of its 52 expected columns, contains an unknown regime code, or has more than 5% fewer rows than the previous month's export. The live site is unchanged when the pipeline stops.</dd>
+        <dt>Latest report</dt>
+        <dd>Each company page shows the report with the latest period end date. Earlier reports feed the payment trend chart.</dd>
+        <dt>No-payments periods</dt>
+        <dd>About 9% of reports state that no payments were made in the period. These show as "No payments reported" and do not contribute to averages or benchmarks.</dd>
+        <dt>Outliers</dt>
+        <dd>Values that cannot be correct are treated as missing and logged: average days to pay above 365, and percentages outside 0 to 100.</dd>
+        <dt>Payment codes</dt>
+        <dd>The free-text payment codes field is normalised to named codes (Prompt Payment Code, Fair Payment Code, GSCOP and others), matched case-insensitively. "No" and blank mean no code membership.</dd>
+        <dt>Regime differences</dt>
+        <dd>Value-in-pounds fields appear from Regime 2 onwards. Retention details appear in Regime 3. Fields are shown only when reported.</dd>
+      </dl>
+    </section>
+
+    <section class="prose-section">
+      <h2>Benchmark bands</h2>
+      <p>Benchmarks use fixed bands tied to the campaign goals, so comparisons are consistent month to month.</p>
+      <dl class="detail-list">
+        <dt>Average time to pay</dt>
+        <dd>30 days or fewer · 31 to 60 days · Over 60 days</dd>
+        <dt>Share paid late</dt>
+        <dd>Under 5% · 5 to 20% · Over 20%</dd>
+        <dt>Faster than X% of companies</dt>
+        <dd>Calculated by comparing each company's latest average time to pay against all other companies' latest reports. This figure changes month to month as new reports are filed.</dd>
+      </dl>
+    </section>
+
+    <section class="prose-section">
+      <h2>What is not shown</h2>
+      <p>Company Watch risk data is not used. Standard payment period is shown as reported; it is not the average time to pay.</p>
+    </section>
+
+    <section class="prose-section">
+      <h2>Licence</h2>
+      <p>Payment practices data is published under the
+      <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="noopener">Open Government Licence v3.0</a>.
+      Companies House data is published under the same licence.</p>
+      <p>Contains public sector information licensed under the Open Government Licence v3.0.</p>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <a href="/" class="site-logo site-logo--sm" aria-label="Good Business Pays home">
+      <img src="/static/logo.svg" alt="Good Business Pays" width="120" height="29">
+    </a>
+    <p>Data under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="noopener">Open Government Licence v3.0</a></p>
+  </div>
+</footer>
+{% endblock %}
