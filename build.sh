@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-EXPORT_URL=${EXPORT_URL:-https://check-payment-practices.service.gov.uk/download/all-reports/csv}
+EXPORT_URL=${EXPORT_URL:-https://check-payment-practices.service.gov.uk/export/csv/}
 
 pip3 install -r requirements.txt
 

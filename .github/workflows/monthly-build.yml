@@ -30,7 +30,7 @@ jobs:
 
       - name: Download payment practices export
         env:
-          EXPORT_URL: ${{ github.event.inputs.export_url || 'https://check-payment-practices.service.gov.uk/download/all-reports/csv' }}
+          EXPORT_URL: ${{ github.event.inputs.export_url || 'https://check-payment-practices.service.gov.uk/export/csv/' }}
         run: |
           echo "Downloading export from $EXPORT_URL"
           curl -fsSL --retry 3 --retry-delay 10 \
