@@ -1,370 +1,335 @@
 {% extends "base.html" %}
 {% set r = c.latest_report %}
 {% set b = r.benchmark %}
-{% block title %}{{ c.company_name }} — Good Business Pays{% endblock %}
+
+{# RAG levels #}
+{% set avg_rag = avg_days_rag(r.avg_days) %}
+{% set late_rag = pct_late_rag(r.pct_late) %}
+{% if r.pct_within_30 is not none and r.pct_31_60 is not none and r.pct_over_60 is not none %}
+  {% set dist_lv, dist_lbl = dist_badge(r.pct_within_30, r.pct_31_60, r.pct_over_60) %}
+{% endif %}
+{# Longest term for range badge #}
+{% set long_days = [r.shortest_period or 0, r.longest_period or 0, r.max_period or 0] | max %}
+{% set terms_rag_lv = avg_days_rag(long_days) if long_days > 0 else none %}
+
+{% block title %}{{ c.company_name | title }} payment report | Good Business Pays{% endblock %}
 
 {% block body %}
+<a class="gbp-skip" href="#main">Skip to the report</a>
 
-{# ── 1. Header with compact search ── #}
-<header class="site-header">
-  <div class="container site-header__inner">
-    <a href="/" class="site-logo" aria-label="Good Business Pays home">
-      {% include "_logo.html" %}
+{# ── 1. Site header ── #}
+<header class="gbp-site-header" data-theme="dark">
+  <div class="gbp-container gbp-site-header__inner">
+    <a class="gbp-site-header__logo" href="/" aria-label="Good Business Pays home">
+      <img src="/static/design-system/logos/gbp-logo-reversed.png" alt="Good Business Pays">
     </a>
-    <form class="search-field search-field--sm" role="search" id="search-form" autocomplete="off">
-      <label class="sr-only" for="search-compact">Search companies</label>
-      <input class="search-field__input" id="search-compact" type="search"
-             placeholder="Search companies…" spellcheck="false">
-      <button class="search-field__btn btn btn--sm" type="submit">Search</button>
+    <form role="search" class="gbp-search gbp-search-sm" id="search-form" autocomplete="off">
+      <label for="q" class="gbp-search-label gbp-sr">Search for a company by name or number</label>
+      <div class="gbp-search-pill">
+        <input id="q" name="q" type="search" class="gbp-search-input" placeholder="Search company name or number" value="">
+        <button type="submit" class="gbp-search-btn gbp-search-btn-icon" aria-label="Search">
+          <svg class="gbp-search-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+        </button>
+      </div>
     </form>
   </div>
 </header>
 
-{# ── 2. Company hero (dark band) ── #}
-<section class="company-hero">
-  <div class="container company-hero__inner">
-    <a href="/" class="company-hero__back">
-      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+{# ── 2. Hero ── #}
+<section class="gbp-hero" data-theme="dark">
+  <svg class="gbp-hero__ring" viewBox="0 0 380 380" aria-hidden="true"><circle cx="190" cy="190" r="150"></circle></svg>
+  <div class="gbp-container gbp-hero__inner">
+    <a class="gbp-back" href="/">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>
       Back to search
     </a>
-    <h1 class="company-hero__name">{{ c.company_name }}</h1>
-    <div class="company-hero__meta">
-      <span>Company {{ c.company_number }}</span>
-      {%- if c.ch and c.ch.sector %}<span>{{ c.ch.sector }}</span>{% endif -%}
-      {%- if c.ch and c.ch.locality %}<span>{{ c.ch.locality }}</span>{% endif -%}
-      {%- if r.end_date %}<span>Period ending {{ r.end_date | fmt_date }}</span>{% endif -%}
+    <div class="gbp-hero__heading">
+      <div class="gbp-ph">
+        <div class="gbp-ph-eyebrow">Prompt Payment Report</div>
+        <h1 class="gbp-ph-title">{{ c.company_name }}</h1>
+        <div class="gbp-ph-metas">
+          <div class="gbp-ph-meta">
+            Company no. {{ c.company_number }}
+            {%- if r.filing_date %} · Filed {{ r.filing_date | fmt_date }}{% endif %}
+            {%- if c.ch and c.ch.sector %} · {{ c.ch.sector }}{% endif %}
+          </div>
+          {%- if c.ch and c.ch.locality %}
+          <div class="gbp-ph-meta">{{ c.ch.locality }}</div>
+          {%- endif %}
+          {%- if r.start_date or r.end_date %}
+          <div class="gbp-ph-meta">Reporting period: {% if r.start_date %}{{ r.start_date | fmt_date }} to {% endif %}{{ r.end_date | fmt_date if r.end_date else "unknown" }}</div>
+          {%- endif %}
+        </div>
+      </div>
     </div>
-    {% if r.url %}
-    <a href="{{ r.url }}" rel="noopener" class="company-hero__official">View official report ↗</a>
-    {% endif %}
   </div>
 </section>
 
-<main id="main">
-  <div class="container">
-
-    {# ── Status warning for dissolved / in-administration companies ── #}
-    {% if c.ch and c.ch.status and c.ch.status != 'active' %}
-    <div class="notice notice--warn">
-      Companies House shows this company as <strong>{{ c.ch.status | replace('-', ' ') | title }}</strong>.
-      Payment data shown is from the last filed report.
-    </div>
-    {% endif %}
-
-    {# ── 3. Company details ── #}
-    <section class="section" aria-labelledby="details-h">
-      <h2 id="details-h" class="sr-only">Company details</h2>
-      <dl class="detail-list detail-list--inline">
-        <div class="detail-list__item">
-          <dt>Reporting period</dt>
-          <dd>{% if r.start_date %}{{ r.start_date | fmt_date }} to {% endif %}{{ r.end_date | fmt_date if r.end_date else "—" }}</dd>
-        </div>
-        <div class="detail-list__item">
-          <dt>Reports filed</dt>
-          <dd>{{ c.reports_count }}</dd>
-        </div>
-        {% if r.regime %}
-        <div class="detail-list__item">
-          <dt>Reporting regime</dt>
-          <dd>{{ r.regime }}</dd>
-        </div>
-        {% endif %}
-        {% if c.ch and c.ch.sic_codes %}
-        <div class="detail-list__item">
-          <dt>SIC codes</dt>
-          <dd>{{ c.ch.sic_codes | join(', ') }}</dd>
-        </div>
-        {% endif %}
-        {% if c.ch and c.ch.previous_names %}
-        <div class="detail-list__item">
-          <dt>Previously</dt>
-          <dd>{{ c.ch.previous_names | join('; ') }}</dd>
-        </div>
-        {% endif %}
-      </dl>
-    </section>
+{# ── 3. Main ── #}
+<main id="main" class="gbp-main" data-theme="light">
+  <div class="gbp-container gbp-main__inner">
 
     {% if r.no_payments %}
-    {# ── No payments notice ── #}
-    <div class="notice notice--info">
-      <strong>No payments were reported</strong> for this period.
-      {% if c.reports_count > 1 %}Earlier periods are shown in the payment history below.{% endif %}
-    </div>
+    {# ── No-payments notice ── #}
+    <section class="gbp-section">
+      <div class="gbp-ph">
+        <h2 class="gbp-ph-title">No payments reported</h2>
+        <div class="gbp-ph-meta">This company reported that no payments were made in this period.{% if c.reports_count > 1 %} Earlier periods are shown in the payment history below.{% endif %}</div>
+      </div>
+    </section>
 
     {% else %}
-    {# ── 4. Headline figures ── #}
-    <section class="section" aria-labelledby="headline-h">
-      <h2 id="headline-h" class="section__heading">Payment performance</h2>
-      <div class="stat-callouts">
+
+    {# ── Performance report ── #}
+    <section class="gbp-section" aria-labelledby="perf">
+      <div class="gbp-ph">
+        <h2 class="gbp-ph-title" id="perf">Performance report</h2>
+        <div class="gbp-ph-meta">How this company compares with other UK companies that report their payment data.</div>
+      </div>
+
+      {# Row 1: Time to pay + Late payment #}
+      <div class="gbp-grid-2">
+
+        {# Time to pay #}
         {% if r.avg_days is not none %}
-        <div class="stat-callout">
-          <span class="stat-callout__value">{{ r.avg_days | round | int }}</span>
-          <span class="stat-callout__unit">days</span>
-          <span class="stat-callout__label">Average time to pay</span>
-        </div>
+        {% set avg_band_idx = 0 if r.avg_days <= 30 else (1 if r.avg_days <= 60 else 2) %}
+        <section class="gbp-card">
+          <div class="gbp-card-head">
+            <h3 class="gbp-card-title">Time to pay</h3>
+            {% if avg_rag %}<span class="gbp-badge gbp-rag-{{ avg_rag }}">{{ rag_name(avg_rag) }}</span>{% endif %}
+          </div>
+          <div class="gbp-stat">
+            <div class="gbp-stat-value">{{ fmt_int(r.avg_days) }} days</div>
+            <div class="gbp-stat-label">Average time to pay an invoice.</div>
+          </div>
+          <div class="gbp-bench gbp-bench-rag">
+            <div class="gbp-bench-ends"><span>Faster</span><span>Slower</span></div>
+            <div class="gbp-bench-row" role="img"
+                 aria-label="Average time to pay compared with the 30-day pledge: {{ fmt_int(r.avg_days) }} days{% if avg_rag %}, rated {{ rag_name(avg_rag) }}{% endif %}, in the band from {{ ['0','30','60'][avg_band_idx] }} to {{ ['30','60','> 60'][avg_band_idx] }} of 3 bands"
+                 style="grid-template-columns: repeat(3, minmax(0px, 1fr));">
+              {% for bi, brag in [(0,1),(1,3),(2,5)] %}
+              <div class="gbp-bench-cell">
+                {% if bi == avg_band_idx %}<div class="gbp-bench-pin">{{ fmt_int(r.avg_days) }} days{% if avg_rag %}<span class="gbp-bench-pin-rating">{{ rag_name(avg_rag) }}</span>{% endif %}</div>{% endif %}
+                <div class="gbp-bench-band{% if bi == avg_band_idx %} gbp-bench-on{% endif %} gbp-rag-{{ brag }}"></div>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="gbp-bench-ticks" aria-hidden="true" style="grid-template-columns: repeat(3, minmax(0px, 1fr));">
+              <span>0</span><span>30</span><span>60<em>&gt; 60</em></span>
+            </div>
+            {% if b and b.faster_than_pct is not none %}<p class="gbp-bench-caption">Pays faster than {{ b.faster_than_pct }}% of reporting companies.</p>{% endif %}
+          </div>
+        </section>
         {% endif %}
+
+        {# Late payment #}
         {% if r.pct_late is not none %}
-        <div class="stat-callout">
-          <span class="stat-callout__value">{{ r.pct_late | round(1) }}</span>
-          <span class="stat-callout__unit">%</span>
-          <span class="stat-callout__label">Paid outside agreed terms</span>
-        </div>
-        {% endif %}
-        {% if r.pct_within_30 is not none %}
-        <div class="stat-callout">
-          <span class="stat-callout__value">{{ r.pct_within_30 | round(1) }}</span>
-          <span class="stat-callout__unit">%</span>
-          <span class="stat-callout__label">Paid within 30 days</span>
-        </div>
-        {% endif %}
-      </div>
-    </section>
-
-    {# ── 5. Benchmark scales ── #}
-    {% if b %}
-    <section class="section" aria-labelledby="benchmark-h">
-      <h2 id="benchmark-h" class="section__heading">How this compares</h2>
-
-      {% if r.avg_days is not none %}
-      <div class="benchmark-block">
-        <p class="benchmark-block__label">Average time to pay — <strong>{{ b.avg_days_band_label }}</strong></p>
-        <div class="benchmark-scale"
-             role="img"
-             aria-label="Average days to pay: {{ r.avg_days | round | int }} days ({{ b.avg_days_band_label }})">
-          {% set mpos = avg_marker_pos(r.avg_days) %}
-          <div class="benchmark-scale__marker" style="left: {{ mpos }}%">
-            <div class="benchmark-scale__marker-label">{{ r.avg_days | round | int }} days</div>
-            <div class="benchmark-scale__marker-arrow"></div>
+        {% set late_band_idx = 0 if r.pct_late < 5 else (1 if r.pct_late <= 20 else 2) %}
+        <section class="gbp-card">
+          <div class="gbp-card-head">
+            <h3 class="gbp-card-title">Late payment</h3>
+            {% if late_rag %}<span class="gbp-badge gbp-rag-{{ late_rag }}">{{ rag_name(late_rag) }}</span>{% endif %}
           </div>
-          <div class="benchmark-scale__bands">
-            <div class="benchmark-scale__band benchmark-scale__band--fast">
-              <span>30 days<br>or fewer</span>
+          <div class="gbp-stat">
+            <div class="gbp-stat-value">{{ fmt_pct(r.pct_late) }}%</div>
+            <div class="gbp-stat-label">Of invoices paid outside agreed terms.</div>
+          </div>
+          <div class="gbp-bench gbp-bench-rag">
+            <div class="gbp-bench-ends"><span>Fewer late</span><span>More late</span></div>
+            <div class="gbp-bench-row" role="img"
+                 aria-label="Share of invoices paid outside agreed terms: {{ fmt_pct(r.pct_late) }}% late{% if late_rag %}, rated {{ rag_name(late_rag) }}{% endif %}, in the band from {{ ['0%','5%','20%'][late_band_idx] }} to {{ ['5%','20%','100%'][late_band_idx] }} of 3 bands"
+                 style="grid-template-columns: repeat(3, minmax(0px, 1fr));">
+              {% for bi, brag in [(0,1),(1,3),(2,5)] %}
+              <div class="gbp-bench-cell">
+                {% if bi == late_band_idx %}<div class="gbp-bench-pin">{{ fmt_pct(r.pct_late) }}% late{% if late_rag %}<span class="gbp-bench-pin-rating">{{ rag_name(late_rag) }}</span>{% endif %}</div>{% endif %}
+                <div class="gbp-bench-band{% if bi == late_band_idx %} gbp-bench-on{% endif %} gbp-rag-{{ brag }}"></div>
+              </div>
+              {% endfor %}
             </div>
-            <div class="benchmark-scale__band benchmark-scale__band--mid">
-              <span>31–60<br>days</span>
-            </div>
-            <div class="benchmark-scale__band benchmark-scale__band--slow">
-              <span>Over<br>60 days</span>
+            <div class="gbp-bench-ticks" aria-hidden="true" style="grid-template-columns: repeat(3, minmax(0px, 1fr));">
+              <span>0%</span><span>5%</span><span>20%<em>100%</em></span>
             </div>
           </div>
-        </div>
-        {% if b.faster_than_pct is not none %}
-        <p class="benchmark-block__note">Pays faster than {{ b.faster_than_pct }}% of reporting companies</p>
+        </section>
         {% endif %}
-      </div>
+
+      </div>{# /gbp-grid-2 #}
+
+      {# Row 2: Distribution + Terms #}
+      <div class="gbp-grid-2">
+
+        {# When are invoices paid? #}
+        {% if r.pct_within_30 is not none and r.pct_31_60 is not none and r.pct_over_60 is not none %}
+        {% set w30 = fmt_int(r.pct_within_30) %}
+        {% set p60 = fmt_int(r.pct_31_60) %}
+        {% set p90 = fmt_int(r.pct_over_60) %}
+        <section class="gbp-card">
+          <div class="gbp-card-head">
+            <h3 class="gbp-card-title">When are invoices paid?</h3>
+            {% if dist_lbl is defined %}<span class="gbp-badge gbp-rag-{{ dist_lv }}">{{ dist_lbl }}</span>{% endif %}
+          </div>
+          <div class="gbp-dist">
+            <div class="gbp-dist-bar" role="img"
+                 aria-label="{{ w30 }}% Within 30 days{% if r.value_within_30 %} · {{ r.value_within_30 | fmt_pounds }}{% endif %} ({{ rag_name(1) }}), {{ p60 }}% 31 to 60 days{% if r.value_31_60 %} · {{ r.value_31_60 | fmt_pounds }}{% endif %} ({{ rag_name(3) }}), {{ p90 }}% Over 60 days{% if r.value_over_60 %} · {{ r.value_over_60 | fmt_pounds }}{% endif %} ({{ rag_name(5) }})">
+              <div class="gbp-dist-seg gbp-rag-1 gbp-rag-fill" style="flex: {{ w30 }} 1 0%;">{% if w30 >= 8 %}{{ w30 }}%{% endif %}</div>
+              <div class="gbp-dist-seg gbp-rag-3 gbp-rag-fill" style="flex: {{ p60 }} 1 0%;">{% if p60 >= 8 %}{{ p60 }}%{% endif %}</div>
+              <div class="gbp-dist-seg gbp-rag-5 gbp-rag-fill" style="flex: {{ p90 }} 1 0%;">{% if p90 >= 8 %}{{ p90 }}%{% endif %}</div>
+            </div>
+            <ul class="gbp-legend">
+              <li><span class="gbp-key gbp-rag-1 gbp-rag-fill"></span><b class="gbp-legend-value">{{ w30 }}%</b>Within 30 days{% if r.value_within_30 %} · {{ r.value_within_30 | fmt_pounds }}{% endif %}<span class="gbp-legend-rating">{{ rag_name(1) }}</span></li>
+              <li><span class="gbp-key gbp-rag-3 gbp-rag-fill"></span><b class="gbp-legend-value">{{ p60 }}%</b>31 to 60 days{% if r.value_31_60 %} · {{ r.value_31_60 | fmt_pounds }}{% endif %}<span class="gbp-legend-rating">{{ rag_name(3) }}</span></li>
+              <li><span class="gbp-key gbp-rag-5 gbp-rag-fill"></span><b class="gbp-legend-value">{{ p90 }}%</b>Over 60 days{% if r.value_over_60 %} · {{ r.value_over_60 | fmt_pounds }}{% endif %}<span class="gbp-legend-rating">{{ rag_name(5) }}</span></li>
+            </ul>
+          </div>
+          <p class="gbp-card-note">{{ w30 }}% of invoices are paid within the 30 days we campaign for.</p>
+        </section>
+        {% endif %}
+
+        {# What payment terms are offered? #}
+        {% if r.shortest_period is not none %}
+        {% set short_pct = range_pos(r.shortest_period) %}
+        {% set long_pct  = range_pos(long_days) %}
+        {% set pledge_pct = range_pos(30) %}
+        {% set short_rag = avg_days_rag(r.shortest_period) %}
+        <section class="gbp-card">
+          <div class="gbp-card-head">
+            <h3 class="gbp-card-title">What payment terms are offered?</h3>
+            {% if terms_rag_lv %}<span class="gbp-badge gbp-rag-{{ terms_rag_lv }}">Up to {{ long_days }} days</span>{% endif %}
+          </div>
+          <div class="gbp-range" role="img"
+               aria-label="Payment terms offered: Shortest {{ r.shortest_period }} days{% if long_days != r.shortest_period %}, Longest {{ long_days }} days{% endif %}. 30-day pledge 30 days">
+            <div class="gbp-range-plot">
+              <div class="gbp-range-track"></div>
+              {% if long_days != r.shortest_period %}
+              <div class="gbp-range-span" style="left: {{ '%.6g' | format(short_pct) }}%; width: calc({{ '%.6g' | format(long_pct - short_pct) }}%);"></div>
+              {% endif %}
+              <div class="gbp-range-target" style="left: {{ '%.6g' | format(pledge_pct) }}%;"><span>30-day pledge</span></div>
+              <i class="gbp-range-dot gbp-range-rag gbp-rag-{{ short_rag }}" style="left: {{ '%.6g' | format(short_pct) }}%;"></i>
+              {% if long_days != r.shortest_period %}
+              <i class="gbp-range-dot gbp-range-em gbp-range-rag gbp-rag-{{ terms_rag_lv }}" style="left: {{ '%.6g' | format(long_pct) }}%;"></i>
+              {% endif %}
+              <div class="gbp-range-lbl {% if short_pct < 20 %}gbp-range-left{% elif short_pct > 70 %}gbp-range-right{% endif %}" style="left: {{ '%.6g' | format(short_pct) }}%;">
+                <b>{{ r.shortest_period }} days</b>
+                <span>{% if long_days == r.shortest_period %}Shortest / Longest{% else %}Shortest{% endif %}</span>
+                {% if short_rag %}<span>{{ rag_name(short_rag) }}</span>{% endif %}
+              </div>
+              {% if long_days != r.shortest_period %}
+              <div class="gbp-range-lbl {% if long_pct < 20 %}gbp-range-left{% elif long_pct > 70 %}gbp-range-right{% endif %}" style="left: {{ '%.6g' | format(long_pct) }}%;">
+                <b>{{ long_days }} days</b>
+                <span>Longest</span>
+                {% if terms_rag_lv %}<span>{{ rag_name(terms_rag_lv) }}</span>{% endif %}
+              </div>
+              {% endif %}
+            </div>
+            <div class="gbp-range-axis" aria-hidden="true"><span>0 days</span><span>120 days</span></div>
+          </div>
+          {% if r.std_payment_terms %}
+          <details class="gbp-details">
+            <summary>Read the full standard terms</summary>
+            <p class="gbp-details__body">{{ r.std_payment_terms }}</p>
+          </details>
+          {% endif %}
+        </section>
+        {% endif %}
+
+      </div>{# /gbp-grid-2 #}
+
+      {# Trend: full-width card #}
+      {% set trend_pts = c.trend | selectattr("avg_days") | list %}
+      {% if trend_pts | length > 1 %}
+      {% set trend_max = trend_pts | map(attribute="avg_days") | max %}
+      <section class="gbp-card">
+        <div class="gbp-card-head"><h3 class="gbp-card-title">Average days to pay over time</h3></div>
+        <div class="gbp-trend">
+          <div class="gbp-trend-plot" role="img"
+               aria-label="Average days to pay by reporting period: {% for p in trend_pts %}{{ p.end_date | fmt_date_short }} {{ fmt_int(p.avg_days) }}{% if not loop.last %}, {% endif %}{% endfor %}"
+               style="grid-template-columns: repeat({{ trend_pts | length }}, minmax(0px, 1fr));">
+            {% for p in trend_pts %}
+            <div class="gbp-trend-col">
+              <span class="gbp-trend-val">{{ fmt_int(p.avg_days) }}</span>
+              <div class="gbp-trend-bar {{ 'gbp-s2' if loop.last else 'gbp-s1' }}" style="height: {{ (p.avg_days / trend_max * 140) | round | int }}px;"></div>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="gbp-trend-axis" style="grid-template-columns: repeat({{ trend_pts | length }}, minmax(0px, 1fr));">
+            {% for p in trend_pts %}<span>{{ p.end_date | fmt_date_short }}</span>{% endfor %}
+          </div>
+        </div>
+      </section>
       {% endif %}
 
-      {% if r.pct_late is not none %}
-      <div class="benchmark-block">
-        <p class="benchmark-block__label">Share paid outside agreed terms — <strong>{{ b.pct_late_band_label }}</strong></p>
-        <div class="benchmark-scale"
-             role="img"
-             aria-label="Late payments: {{ r.pct_late | round(1) }}% ({{ b.pct_late_band_label }})">
-          {% set lpos = late_marker_pos(r.pct_late) %}
-          <div class="benchmark-scale__marker" style="left: {{ lpos }}%">
-            <div class="benchmark-scale__marker-label">{{ r.pct_late | round(1) }}%</div>
-            <div class="benchmark-scale__marker-arrow"></div>
-          </div>
-          <div class="benchmark-scale__bands">
-            <div class="benchmark-scale__band benchmark-scale__band--fast">
-              <span>Under<br>5%</span>
-            </div>
-            <div class="benchmark-scale__band benchmark-scale__band--mid">
-              <span>5–20%</span>
-            </div>
-            <div class="benchmark-scale__band benchmark-scale__band--slow">
-              <span>Over<br>20%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-    </section>
-    {% endif %}
+    </section>{# /performance #}
+    {% endif %}{# /not no_payments #}
 
-    {# ── 6. Distribution bar ── #}
-    {% if r.pct_within_30 is not none %}
-    <section class="section" aria-labelledby="distribution-h">
-      <h2 id="distribution-h" class="section__heading">When invoices are paid</h2>
-      <div class="distribution-bar" role="img" aria-label="Invoice payment timing">
-        {% if r.pct_within_30 %}
-        <div class="distribution-bar__seg distribution-bar__seg--30"
-             style="width: {{ r.pct_within_30 | round(1) }}%">
-          <span class="distribution-bar__num">{{ r.pct_within_30 | round(1) }}%</span>
-        </div>
-        {% endif %}
-        {% if r.pct_31_60 %}
-        <div class="distribution-bar__seg distribution-bar__seg--60"
-             style="width: {{ r.pct_31_60 | round(1) }}%">
-          <span class="distribution-bar__num">{{ r.pct_31_60 | round(1) }}%</span>
-        </div>
-        {% endif %}
-        {% if r.pct_over_60 %}
-        <div class="distribution-bar__seg distribution-bar__seg--late"
-             style="width: {{ r.pct_over_60 | round(1) }}%">
-          <span class="distribution-bar__num">{{ r.pct_over_60 | round(1) }}%</span>
-        </div>
-        {% endif %}
-      </div>
-      <ul class="distribution-legend" aria-hidden="true">
-        <li class="distribution-legend__item distribution-legend__item--30">
-          Within 30 days{% if r.value_within_30 %} · {{ r.value_within_30 | fmt_pounds }}{% endif %}
-        </li>
-        <li class="distribution-legend__item distribution-legend__item--60">
-          31–60 days{% if r.value_31_60 %} · {{ r.value_31_60 | fmt_pounds }}{% endif %}
-        </li>
-        <li class="distribution-legend__item distribution-legend__item--late">
-          Over 60 days{% if r.value_over_60 %} · {{ r.value_over_60 | fmt_pounds }}{% endif %}
-        </li>
-      </ul>
-    </section>
-    {% endif %}
-
-    {# ── 7. Payment terms range line ── #}
-    {% if r.shortest_period is not none %}
-    <section class="section" aria-labelledby="terms-h">
-      <h2 id="terms-h" class="section__heading">Payment terms</h2>
-      {% set tmax = range_term_max(r) %}
-      <div class="range-line" role="img"
-           aria-label="Payment terms: {{ r.shortest_period }} days shortest{% if r.max_period %}, {{ r.max_period }} days maximum{% endif %}">
-        <div class="range-line__track">
-          {# 30-day pledge reference #}
-          <div class="range-line__pledge" style="left: {{ (30 / tmax * 100) | round(1) }}%">
-            <span class="range-line__pledge-label">30-day pledge</span>
-          </div>
-          {# Fill from shortest to max #}
-          {% set fill_start = (r.shortest_period / tmax * 100) | round(1) %}
-          {% set fill_end_days = r.max_period or r.longest_period or r.shortest_period %}
-          {% set fill_end = ([fill_end_days, tmax] | min / tmax * 100) | round(1) %}
-          <div class="range-line__fill"
-               style="left: {{ fill_start }}%; width: {{ (fill_end - fill_start + 0.1) | abs | round(1) }}%">
-          </div>
-          {# Tick marks #}
-          <div class="range-line__tick" style="left: {{ (r.shortest_period / tmax * 100) | round(1) }}%">
-            <span class="range-line__tick-label">{{ r.shortest_period }}</span>
-          </div>
-          {% if r.longest_period and r.longest_period != r.shortest_period %}
-          <div class="range-line__tick" style="left: {{ (r.longest_period / tmax * 100) | round(1) }}%">
-            <span class="range-line__tick-label">{{ r.longest_period }}</span>
-          </div>
-          {% endif %}
-          {% if r.max_period and r.max_period != r.longest_period and r.max_period != r.shortest_period %}
-          <div class="range-line__tick range-line__tick--max"
-               style="left: {{ ([r.max_period, tmax] | min / tmax * 100) | round(1) }}%">
-            <span class="range-line__tick-label">{{ r.max_period }}</span>
-          </div>
-          {% endif %}
-        </div>
-        <div class="range-line__axis">
-          <span>0</span>
-          <span>{{ (tmax / 2) | int }} days</span>
-          <span>{{ tmax }} days</span>
-        </div>
-      </div>
-      <dl class="detail-list detail-list--compact">
-        <div class="detail-list__item">
-          <dt>Shortest standard payment period</dt>
-          <dd>{{ r.shortest_period }} days</dd>
-        </div>
-        {% if r.longest_period is not none and r.longest_period != r.shortest_period %}
-        <div class="detail-list__item">
-          <dt>Longest standard payment period</dt>
-          <dd>{{ r.longest_period }} days</dd>
-        </div>
-        {% endif %}
-        {% if r.max_period is not none %}
-        <div class="detail-list__item">
-          <dt>Maximum contractual payment period</dt>
-          <dd>{{ r.max_period }} days</dd>
-        </div>
-        {% endif %}
-        {% if r.std_payment_terms %}
-        <div class="detail-list__item detail-list__item--wide">
-          <dt>Standard payment terms</dt>
-          <dd>{{ r.std_payment_terms }}</dd>
-        </div>
-        {% endif %}
-      </dl>
-    </section>
-    {% endif %}
-
-    {% endif %}{# /if not no_payments #}
-
-    {# ── 8. Payment trend ── #}
-    {% set trend_with_data = c.trend | selectattr("avg_days") | list %}
-    {% if trend_with_data | length > 1 %}
-    <section class="section" aria-labelledby="trend-h">
-      <h2 id="trend-h" class="section__heading">Average days to pay over time</h2>
-      {% set max_days = trend_with_data | map(attribute="avg_days") | max %}
-      <div class="bar-trend" role="img" aria-label="Payment history bar chart">
-        {% for period in trend_with_data %}
-        <div class="bar-trend__item">
-          <div class="bar-trend__bar" style="--h: {{ (period.avg_days / max_days * 90) | round(1) }}%">
-            <span class="bar-trend__value">{{ period.avg_days | round | int }}</span>
-          </div>
-          <span class="bar-trend__label">{{ period.end_date | fmt_date_short }}</span>
-        </div>
-        {% endfor %}
-      </div>
-    </section>
-    {% endif %}
-
-    {# ── 9. Policies ── #}
+    {# ── Payment policies ── #}
     {% if not r.no_payments %}
-    <section class="section" aria-labelledby="policies-h">
-      <h2 id="policies-h" class="section__heading">Payment policies</h2>
-      <dl class="detail-list">
-        <div class="detail-list__item">
-          <dt>Payment code membership</dt>
-          <dd>{% if r.payment_codes %}{{ r.payment_codes | join(", ") }}{% else %}None reported{% endif %}</dd>
-        </div>
-        {% if r.e_invoicing is not none %}
-        <div class="detail-list__item">
-          <dt>E-invoicing offered to suppliers</dt>
-          <dd>{{ "Yes" if r.e_invoicing else "No" }}</dd>
-        </div>
-        {% endif %}
-        {% if r.supply_chain_finance is not none %}
-        <div class="detail-list__item">
-          <dt>Supply-chain financing offered</dt>
-          <dd>{{ "Yes" if r.supply_chain_finance else "No" }}</dd>
-        </div>
-        {% endif %}
-        {% if r.supplier_list_charges is not none %}
-        <div class="detail-list__item">
-          <dt>Charges for remaining on supplier list</dt>
-          <dd>{{ "Yes" if r.supplier_list_charges else "No" }}</dd>
-        </div>
-        {% endif %}
+    <section class="gbp-section" aria-labelledby="policies">
+      <div class="gbp-ph">
+        <h2 class="gbp-ph-title" id="policies">Payment policies</h2>
+        <div class="gbp-ph-meta">What the company says about how it pays suppliers.</div>
+      </div>
+      <section class="gbp-card">
+        <div class="gbp-card-head"><h3 class="gbp-card-title">Supplier policies</h3></div>
+        <dl class="gbp-dl" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
+          <div class="gbp-dl-item"><dt>Payment code membership</dt><dd>{% if r.payment_codes %}{{ r.payment_codes | join(", ") }}{% else %}None reported{% endif %}</dd></div>
+          {% if r.e_invoicing is not none %}<div class="gbp-dl-item"><dt>E-invoicing offered</dt><dd>{{ "Yes" if r.e_invoicing else "No" }}</dd></div>{% endif %}
+          {% if r.supply_chain_finance is not none %}<div class="gbp-dl-item"><dt>Supply-chain financing offered</dt><dd>{{ "Yes" if r.supply_chain_finance else "No" }}</dd></div>{% endif %}
+          {% if r.supplier_list_charges is not none %}<div class="gbp-dl-item"><dt>Charges to stay on supplier list</dt><dd>{{ "Yes" if r.supplier_list_charges else "No" }}</dd></div>{% endif %}
+        </dl>
         {% if r.dispute_resolution %}
-        <div class="detail-list__item detail-list__item--wide">
-          <dt>Dispute resolution process</dt>
-          <dd>{{ r.dispute_resolution }}</dd>
-        </div>
+        <details class="gbp-details">
+          <summary>Read the dispute resolution process</summary>
+          <p class="gbp-details__body">{{ r.dispute_resolution }}</p>
+        </details>
         {% endif %}
-      </dl>
+      </section>
     </section>
     {% endif %}
 
-  </div>{# /container #}
+    {# ── Report details ── #}
+    <section class="gbp-ref" aria-labelledby="ref">
+      <h2 id="ref" class="gbp-ref__label">Report details</h2>
+      <dl class="gbp-dl gbp-dl-sm" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
+        <div class="gbp-dl-item"><dt>Reports filed</dt><dd>{{ c.reports_count }}</dd></div>
+        {% if r.regime %}<div class="gbp-dl-item"><dt>Reporting regime</dt><dd>{{ r.regime }}</dd></div>{% endif %}
+        {% if r.end_date %}<div class="gbp-dl-item"><dt>Period ending</dt><dd>{{ r.end_date | fmt_date }}</dd></div>{% endif %}
+        {% if r.url %}<div class="gbp-dl-item"><dt>Official report</dt><dd><a href="{{ r.url }}" rel="noopener">View on GOV.UK</a></dd></div>{% endif %}
+      </dl>
+    </section>
 
-  {# ── 10. Campaign close ── #}
-  <div class="support-block">
-    <div class="container support-block__inner">
-      <h2 class="support-block__title">Make the 30-day pledge</h2>
-      <p class="support-block__body">Join the businesses committed to paying suppliers on time. Good business pays promptly.</p>
-      <a href="https://www.goodbusinesspays.com/pledge" class="btn btn--white" rel="noopener">Make the pledge</a>
-    </div>
-  </div>
+    <p class="gbp-source">Payment figures as reported by the company under the UK payment practices reporting duty. Contains public sector information licensed under the Open Government Licence v3.0.</p>
 
+  </div>{# /gbp-main__inner #}
 </main>
 
-<footer class="site-footer">
-  <div class="container site-footer__inner">
-    <a href="/" class="site-logo site-logo--sm" aria-label="Good Business Pays home">
-      {% include "_logo.html" %}
-    </a>
-    <p>Data under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="noopener">Open Government Licence v3.0</a></p>
+{# ── CTA band ── #}
+<section class="gbp-cta" data-theme="dark">
+  <div class="gbp-container gbp-cta__inner">
+    <h2 class="gbp-hl gbp-hl-m">Good business is paying today, so the economy can <span class="gbp-kw">grow<svg class="gbp-under" viewBox="0 0 200 16" preserveAspectRatio="none"><path d="M3 10 C 40 5, 90 4, 130 6 S 185 9, 197 5" stroke-width="7" vector-effect="non-scaling-stroke"></path></svg></span> tomorrow.</h2>
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div class="gbp-support">
+        <p>Over 50,000 SMEs close a year due to cash flow problems.</p>
+        <p>Join the businesses committed to paying suppliers within 30 days.</p>
+        <p class="gbp-ask">Make the 30-day pledge to show your support.</p>
+        <p class="gbp-tag">#GoodBusinessPays</p>
+      </div>
+      <div class="gbp-cta__actions">
+        <a href="https://www.goodbusinesspays.com/pledge" class="gbp-btn" rel="noopener">Make the pledge</a>
+        <a href="https://www.goodbusinesspays.com/pledge" rel="noopener">Is this your company? Pledge to pay faster</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ── Footer ── #}
+<footer class="gbp-footer" data-theme="dark">
+  <div class="gbp-container gbp-footer__inner">
+    <img src="/static/design-system/logos/gbp-mark-green.png" alt="Good Business Pays">
+    <nav aria-label="Footer">
+      <a href="/about/">About the data</a>
+      <a href="https://www.goodbusinesspays.com/privacy" rel="noopener">Privacy</a>
+    </nav>
+    <span class="gbp-footer__small">© Good Business Pays CIC</span>
   </div>
 </footer>
 {% endblock %}
@@ -376,7 +341,7 @@
   if (sf) {
     sf.addEventListener('submit', function (e) {
       e.preventDefault();
-      var q = document.getElementById('search-compact').value.trim();
+      var q = sf.elements['q'].value.trim();
       if (q) window.location.href = '/?q=' + encodeURIComponent(q);
     });
   }

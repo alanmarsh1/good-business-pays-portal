@@ -2,94 +2,171 @@
 {% block title %}About the data — Good Business Pays{% endblock %}
 
 {% block body %}
-<header class="site-header">
-  <div class="container site-header__inner">
-    <a href="/" class="site-logo" aria-label="Good Business Pays home">
-      {% include "_logo.html" %}
+<a class="gbp-skip" href="#main">Skip to content</a>
+
+{# ── Site header ── #}
+<header class="gbp-site-header" data-theme="dark">
+  <div class="gbp-container gbp-site-header__inner">
+    <a class="gbp-site-header__logo" href="/" aria-label="Good Business Pays home">
+      <img src="/static/design-system/logos/gbp-logo-reversed.png" alt="Good Business Pays">
     </a>
-    <nav class="site-nav" aria-label="Site">
-      <a href="/about/" aria-current="page">About the data</a>
-    </nav>
+    <form role="search" class="gbp-search gbp-search-sm" id="search-form" autocomplete="off">
+      <label for="q" class="gbp-search-label gbp-sr">Search for a company by name or number</label>
+      <div class="gbp-search-pill">
+        <input id="q" name="q" type="search" class="gbp-search-input" placeholder="Search company name or number" value="">
+        <button type="submit" class="gbp-search-btn gbp-search-btn-icon" aria-label="Search">
+          <svg class="gbp-search-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+        </button>
+      </div>
+    </form>
   </div>
 </header>
 
-<main id="main">
-  <div class="container container--narrow">
-    <div class="page-heading">
-      <h1 class="page-heading__title">About the data</h1>
-      <p class="page-heading__meta">Last updated: {{ build_date }} · {{ company_count | default(0) | int }} companies</p>
+{# ── Hero ── #}
+<section class="gbp-hero" data-theme="dark">
+  <svg class="gbp-hero__ring" viewBox="0 0 380 380" aria-hidden="true"><circle cx="190" cy="190" r="150"></circle></svg>
+  <div class="gbp-container gbp-hero__inner">
+    <a class="gbp-back" href="/">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>
+      Back to search
+    </a>
+    <div class="gbp-hero__heading">
+      <div class="gbp-ph">
+        <div class="gbp-ph-eyebrow">Good Business Pays</div>
+        <h1 class="gbp-ph-title">About the data</h1>
+        <div class="gbp-ph-metas">
+          <div class="gbp-ph-meta">Last updated: {{ build_date }} · {{ company_count | default(0) | int }} companies</div>
+        </div>
+      </div>
     </div>
+  </div>
+</section>
 
-    <section class="prose-section">
-      <h2>Data sources</h2>
-      <p>This portal uses two free public data sources:</p>
-      <dl class="detail-list">
-        <dt>UK payment practices export</dt>
-        <dd>Every report filed since April 2017, covering {{ company_count | default(0) | int }} companies.
-        Published by the Department for Business and Trade at
-        <a href="https://check-payment-practices.service.gov.uk/" rel="noopener">check-payment-practices.service.gov.uk</a>.
-        Updated when new reports are filed.</dd>
-        <dt>Companies House free data product</dt>
-        <dd>Registered address, SIC codes, previous names and company status.
-        Published by Companies House at
-        <a href="https://download.companieshouse.gov.uk/en_output.html" rel="noopener">download.companieshouse.gov.uk</a>.
-        Published monthly within 5 working days of month end.</dd>
-      </dl>
+{# ── Main ── #}
+<main id="main" class="gbp-main" data-theme="light">
+  <div class="gbp-container gbp-main__inner" style="max-width:720px;">
+
+    <section class="gbp-section" aria-labelledby="sources">
+      <div class="gbp-ph"><h2 class="gbp-ph-title" id="sources">Data sources</h2></div>
+      <section class="gbp-card">
+        <p>This portal uses two free public data sources:</p>
+        <dl class="gbp-dl">
+          <div class="gbp-dl-item">
+            <dt>UK payment practices export</dt>
+            <dd>Every report filed since April 2017, covering {{ company_count | default(0) | int }} companies.
+            Published by the Department for Business and Trade at
+            <a href="https://check-payment-practices.service.gov.uk/" rel="noopener">check-payment-practices.service.gov.uk</a>.
+            Updated when new reports are filed.</dd>
+          </div>
+          <div class="gbp-dl-item">
+            <dt>Companies House free data product</dt>
+            <dd>Registered address, SIC codes, previous names and company status.
+            Published by Companies House at
+            <a href="https://download.companieshouse.gov.uk/en_output.html" rel="noopener">download.companieshouse.gov.uk</a>.
+            Published monthly within 5 working days of month end.</dd>
+          </div>
+        </dl>
+      </section>
     </section>
 
-    <section class="prose-section">
-      <h2>Processing rules</h2>
-      <p>All rules are applied consistently every month. Every figure on a company page can be traced to the export.</p>
-      <dl class="detail-list detail-list--rules">
-        <dt>Validation</dt>
-        <dd>The pipeline stops if the export is missing any of its 52 expected columns, contains an unknown regime code, or has more than 5% fewer rows than the previous month's export. The live site is unchanged when the pipeline stops.</dd>
-        <dt>Latest report</dt>
-        <dd>Each company page shows the report with the latest period end date. Earlier reports feed the payment trend chart.</dd>
-        <dt>No-payments periods</dt>
-        <dd>About 9% of reports state that no payments were made in the period. These show as "No payments reported" and do not contribute to averages or benchmarks.</dd>
-        <dt>Outliers</dt>
-        <dd>Values that cannot be correct are treated as missing and logged: average days to pay above 365, and percentages outside 0 to 100.</dd>
-        <dt>Payment codes</dt>
-        <dd>The free-text payment codes field is normalised to named codes (Prompt Payment Code, Fair Payment Code, GSCOP and others), matched case-insensitively. "No" and blank mean no code membership.</dd>
-        <dt>Regime differences</dt>
-        <dd>Value-in-pounds fields appear from Regime 2 onwards. Retention details appear in Regime 3. Fields are shown only when reported.</dd>
-      </dl>
+    <section class="gbp-section" aria-labelledby="rules">
+      <div class="gbp-ph"><h2 class="gbp-ph-title" id="rules">Processing rules</h2></div>
+      <section class="gbp-card">
+        <p>All rules are applied consistently every month. Every figure on a company page can be traced to the export.</p>
+        <dl class="gbp-dl">
+          <div class="gbp-dl-item">
+            <dt>Validation</dt>
+            <dd>The pipeline stops if the export is missing any of its 52 expected columns, contains an unknown regime code, or has more than 5% fewer rows than the previous month's export. The live site is unchanged when the pipeline stops.</dd>
+          </div>
+          <div class="gbp-dl-item">
+            <dt>Latest report</dt>
+            <dd>Each company page shows the report with the latest period end date. Earlier reports feed the payment trend chart.</dd>
+          </div>
+          <div class="gbp-dl-item">
+            <dt>No-payments periods</dt>
+            <dd>About 9% of reports state that no payments were made in the period. These show as "No payments reported" and do not contribute to averages or benchmarks.</dd>
+          </div>
+          <div class="gbp-dl-item">
+            <dt>Outliers</dt>
+            <dd>Values that cannot be correct are treated as missing and logged: average days to pay above 365, and percentages outside 0 to 100.</dd>
+          </div>
+          <div class="gbp-dl-item">
+            <dt>Payment codes</dt>
+            <dd>The free-text payment codes field is normalised to named codes (Prompt Payment Code, Fair Payment Code, GSCOP and others), matched case-insensitively. "No" and blank mean no code membership.</dd>
+          </div>
+          <div class="gbp-dl-item">
+            <dt>Regime differences</dt>
+            <dd>Value-in-pounds fields appear from Regime 2 onwards. Retention details appear in Regime 3. Fields are shown only when reported.</dd>
+          </div>
+        </dl>
+      </section>
     </section>
 
-    <section class="prose-section">
-      <h2>Benchmark bands</h2>
-      <p>Benchmarks use fixed bands tied to the campaign goals, so comparisons are consistent month to month.</p>
-      <dl class="detail-list">
-        <dt>Average time to pay</dt>
-        <dd>30 days or fewer · 31 to 60 days · Over 60 days</dd>
-        <dt>Share paid late</dt>
-        <dd>Under 5% · 5 to 20% · Over 20%</dd>
-        <dt>Faster than X% of companies</dt>
-        <dd>Calculated by comparing each company's latest average time to pay against all other companies' latest reports. This figure changes month to month as new reports are filed.</dd>
-      </dl>
+    <section class="gbp-section" aria-labelledby="benchmarks">
+      <div class="gbp-ph"><h2 class="gbp-ph-title" id="benchmarks">Benchmark bands</h2></div>
+      <section class="gbp-card">
+        <p>Benchmarks use fixed bands tied to the campaign goals, so comparisons are consistent month to month.</p>
+        <dl class="gbp-dl">
+          <div class="gbp-dl-item">
+            <dt>Average time to pay</dt>
+            <dd>30 days or fewer · 31 to 60 days · Over 60 days</dd>
+          </div>
+          <div class="gbp-dl-item">
+            <dt>Share paid late</dt>
+            <dd>Under 5% · 5 to 20% · Over 20%</dd>
+          </div>
+          <div class="gbp-dl-item">
+            <dt>Faster than X% of companies</dt>
+            <dd>Calculated by comparing each company's latest average time to pay against all other companies' latest reports. This figure changes month to month as new reports are filed.</dd>
+          </div>
+        </dl>
+      </section>
     </section>
 
-    <section class="prose-section">
-      <h2>What is not shown</h2>
-      <p>Company Watch risk data is not used. Standard payment period is shown as reported; it is not the average time to pay.</p>
+    <section class="gbp-section" aria-labelledby="not-shown">
+      <div class="gbp-ph"><h2 class="gbp-ph-title" id="not-shown">What is not shown</h2></div>
+      <section class="gbp-card">
+        <p>Company Watch risk data is not used. Standard payment period is shown as reported; it is not the average time to pay.</p>
+      </section>
     </section>
 
-    <section class="prose-section">
-      <h2>Licence</h2>
-      <p>Payment practices data is published under the
-      <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="noopener">Open Government Licence v3.0</a>.
-      Companies House data is published under the same licence.</p>
-      <p>Contains public sector information licensed under the Open Government Licence v3.0.</p>
+    <section class="gbp-section" aria-labelledby="licence">
+      <div class="gbp-ph"><h2 class="gbp-ph-title" id="licence">Licence</h2></div>
+      <section class="gbp-card">
+        <p>Payment practices data is published under the
+        <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="noopener">Open Government Licence v3.0</a>.
+        Companies House data is published under the same licence.</p>
+        <p>Contains public sector information licensed under the Open Government Licence v3.0.</p>
+      </section>
     </section>
+
   </div>
 </main>
 
-<footer class="site-footer">
-  <div class="container site-footer__inner">
-    <a href="/" class="site-logo site-logo--sm" aria-label="Good Business Pays home">
-      {% include "_logo.html" %}
-    </a>
-    <p>Data under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="noopener">Open Government Licence v3.0</a></p>
+{# ── Footer ── #}
+<footer class="gbp-footer" data-theme="dark">
+  <div class="gbp-container gbp-footer__inner">
+    <img src="/static/design-system/logos/gbp-mark-green.png" alt="Good Business Pays">
+    <nav aria-label="Footer">
+      <a href="/about/" aria-current="page">About the data</a>
+      <a href="https://www.goodbusinesspays.com/privacy" rel="noopener">Privacy</a>
+    </nav>
+    <span class="gbp-footer__small">© Good Business Pays CIC</span>
   </div>
 </footer>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  var sf = document.getElementById('search-form');
+  if (sf) {
+    sf.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var q = sf.elements['q'].value.trim();
+      if (q) window.location.href = '/?q=' + encodeURIComponent(q);
+    });
+  }
+})();
+</script>
 {% endblock %}

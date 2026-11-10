@@ -1,59 +1,85 @@
 {% extends "base.html" %}
-{% block title %}Search — Good Business Pays{% endblock %}
+{% block title %}Good Business Pays — How quickly do companies pay?{% endblock %}
 
 {% block body %}
-<header class="site-header">
-  <div class="container site-header__inner">
-    <a href="/" class="site-logo" aria-label="Good Business Pays home">
-      {% include "_logo.html" %}
+<a class="gbp-skip" href="#main">Skip to search</a>
+
+{# ── Site header ── #}
+<header class="gbp-site-header" data-theme="dark">
+  <div class="gbp-container gbp-site-header__inner">
+    <a class="gbp-site-header__logo" href="/" aria-label="Good Business Pays home">
+      <img src="/static/design-system/logos/gbp-logo-reversed.png" alt="Good Business Pays">
     </a>
-    <nav class="site-nav" aria-label="Site">
-      <a href="/about/">About the data</a>
+    <nav aria-label="Site">
+      <a href="/about/" style="color:var(--ink);font-size:0.875rem;">About the data</a>
     </nav>
   </div>
 </header>
 
-<main id="main">
-  <section class="search-hero">
-    <div class="container search-hero__inner">
-      <h1 class="search-hero__title">How quickly do companies pay?</h1>
-      <p class="search-hero__subtitle">Search the official UK payment practices reporting data</p>
-      <form class="search-field" role="search" id="search-form" autocomplete="off">
-        <label class="sr-only" for="search-input">Search by company name or number</label>
-        <input
-          class="search-field__input"
-          id="search-input"
-          type="search"
-          placeholder="Company name or number…"
-          aria-label="Search by company name or number"
-          spellcheck="false"
-        >
-        <button class="search-field__btn btn" type="submit">Search</button>
-      </form>
+{# ── Hero with large search ── #}
+<section class="gbp-hero gbp-hero--home" data-theme="dark">
+  <svg class="gbp-hero__ring" viewBox="0 0 380 380" aria-hidden="true"><circle cx="190" cy="190" r="150"></circle></svg>
+  <div class="gbp-container gbp-hero__inner">
+    <div class="gbp-hero__heading">
+      <div class="gbp-ph">
+        <h1 class="gbp-ph-title">How quickly do companies pay?</h1>
+        <div class="gbp-ph-meta">Search the official UK payment practices reporting data.</div>
+      </div>
     </div>
-  </section>
+    <form role="search" class="gbp-search" id="search-form" autocomplete="off">
+      <label for="search-input" class="gbp-search-label gbp-sr">Search by company name or number</label>
+      <div class="gbp-search-pill">
+        <input id="search-input" name="q" type="search" class="gbp-search-input"
+               placeholder="Company name or number…"
+               spellcheck="false">
+        <button type="submit" class="gbp-search-btn" aria-label="Search">Search</button>
+      </div>
+    </form>
+  </div>
+</section>
 
-  <section class="search-results" id="search-results" aria-live="polite" aria-label="Search results">
-    <div class="container">
+{# ── Results ── #}
+<main id="main" data-theme="light">
+  <section class="gbp-section" id="search-results" aria-live="polite" aria-label="Search results">
+    <div class="gbp-container">
       <div id="results-inner"></div>
     </div>
   </section>
 
-  <section class="about-strip">
-    <div class="container about-strip__inner">
-      <p>Data from the <a href="https://check-payment-practices.service.gov.uk/" rel="noopener">UK government payment practices register</a>.
-      Updated monthly. <a href="/about/">About the data</a>.</p>
-      <p class="about-strip__date">Last updated: {{ build_date }}</p>
-    </div>
-  </section>
+  <div class="gbp-source" style="text-align:center;padding:var(--space-5) 0;">
+    Data from the <a href="https://check-payment-practices.service.gov.uk/" rel="noopener">UK government payment practices register</a>.
+    Updated monthly. <a href="/about/">About the data</a>.
+    Last updated: {{ build_date }}.
+  </div>
 </main>
 
-<footer class="site-footer">
-  <div class="container site-footer__inner">
-    <a href="/" class="site-logo site-logo--sm" aria-label="Good Business Pays home">
-      {% include "_logo.html" %}
-    </a>
-    <p>Data under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="noopener">Open Government Licence v3.0</a></p>
+{# ── CTA band ── #}
+<section class="gbp-cta" data-theme="dark">
+  <div class="gbp-container gbp-cta__inner">
+    <h2 class="gbp-hl gbp-hl-m">Good business is paying today, so the economy can <span class="gbp-kw">grow<svg class="gbp-under" viewBox="0 0 200 16" preserveAspectRatio="none"><path d="M3 10 C 40 5, 90 4, 130 6 S 185 9, 197 5" stroke-width="7" vector-effect="non-scaling-stroke"></path></svg></span> tomorrow.</h2>
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div class="gbp-support">
+        <p>Over 50,000 SMEs close a year due to cash flow problems.</p>
+        <p>Join the businesses committed to paying suppliers within 30 days.</p>
+        <p class="gbp-ask">Make the 30-day pledge to show your support.</p>
+        <p class="gbp-tag">#GoodBusinessPays</p>
+      </div>
+      <div class="gbp-cta__actions">
+        <a href="https://www.goodbusinesspays.com/pledge" class="gbp-btn" rel="noopener">Make the pledge</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ── Footer ── #}
+<footer class="gbp-footer" data-theme="dark">
+  <div class="gbp-container gbp-footer__inner">
+    <img src="/static/design-system/logos/gbp-mark-green.png" alt="Good Business Pays">
+    <nav aria-label="Footer">
+      <a href="/about/">About the data</a>
+      <a href="https://www.goodbusinesspays.com/privacy" rel="noopener">Privacy</a>
+    </nav>
+    <span class="gbp-footer__small">© Good Business Pays CIC</span>
   </div>
 </footer>
 {% endblock %}

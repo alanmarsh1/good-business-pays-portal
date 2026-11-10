@@ -1,0 +1,79 @@
+/* Good Business Pays portal: page layout.
+   Load order: fonts.css, tokens.css, components.css, layout.css.
+   Components (gbp-card, gbp-bench, gbp-range ...) live in components.css; this file only places them on the page. */
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--white); color: var(--forest); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+a { color: var(--link); }
+a:hover { color: var(--deep); }
+[data-theme="dark"] a:not(.gbp-btn) { color: var(--white); }
+[data-theme="dark"] a:not(.gbp-btn):hover { color: var(--signal); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.gbp-container { max-width: 1200px; margin: 0 auto; padding-left: var(--space-6); padding-right: var(--space-6); }
+.gbp-skip { position: absolute; left: -9999px; }
+.gbp-skip:focus { left: var(--space-4); top: var(--space-4); z-index: 10; background: var(--white); color: var(--forest); padding: var(--space-2) var(--space-4); }
+
+/* Site header: deep green, real logo left, compact search pill right */
+.gbp-site-header { background: var(--deep); border-bottom: 1px solid var(--hairline); }
+.gbp-site-header__inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4) var(--space-6); padding-top: var(--space-4); padding-bottom: var(--space-4); }
+.gbp-site-header__logo { display: flex; }
+.gbp-site-header__logo img { height: 40px; width: auto; display: block; }
+.gbp-site-header .gbp-search { flex: 0 1 380px; }
+
+/* Hero: same deep green as the header, continuous with it. Signal ring bleeds off the top right. */
+.gbp-hero { background: var(--deep); color: var(--ink); position: relative; overflow: hidden; }
+.gbp-hero__ring { position: absolute; right: -110px; top: -40px; width: 380px; height: 380px; pointer-events: none; }
+.gbp-hero__ring circle { fill: none; stroke: var(--signal); stroke-width: 40; }
+.gbp-hero__inner { position: relative; display: flex; flex-direction: column; gap: 28px; padding-top: 40px; padding-bottom: var(--space-8); }
+.gbp-hero__heading { max-width: 720px; }
+.gbp-back { display: inline-flex; align-items: center; gap: var(--space-2); align-self: flex-start; font-size: 15px; font-weight: 600; text-decoration: none; }
+.gbp-back svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.gbp-hero .gbp-ph-meta a { color: var(--white); font-weight: 600; }
+
+/* Main content: white ground, sections 56px apart */
+.gbp-main { background: var(--surface); }
+.gbp-main__inner { display: flex; flex-direction: column; gap: 56px; padding-top: 56px; padding-bottom: var(--space-8); }
+.gbp-section { display: flex; flex-direction: column; gap: var(--space-5); }
+.gbp-section > .gbp-ph .gbp-ph-title { font-size: 44px; }
+.gbp-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: var(--space-5); }
+
+/* Long text inside cards goes behind a disclosure */
+.gbp-details { border-top: 1px solid var(--hairline); padding-top: var(--space-4); font-size: 15px; line-height: 24px; }
+.gbp-details summary { cursor: pointer; font-weight: 600; }
+.gbp-details__body { margin: var(--space-4) 0 0; color: var(--ink); white-space: pre-line; }
+
+/* Quiet reference block (company details) near the foot of the report */
+.gbp-ref { border-top: 1px solid var(--hairline); padding-top: var(--space-5); display: flex; flex-direction: column; gap: var(--space-4); }
+.gbp-ref__label { margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-muted); }
+.gbp-source { margin: 0; font-size: 12px; line-height: 18px; color: var(--ink-muted); }
+
+/* Closing campaign band */
+.gbp-cta { background: var(--deep); color: var(--ink); }
+.gbp-cta__inner { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-7); align-items: center; padding-top: 72px; padding-bottom: 72px; }
+.gbp-cta__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) 20px; }
+.gbp-cta__actions a:not(.gbp-btn) { font-weight: 600; font-size: 15px; }
+
+/* Footer */
+.gbp-footer { background: var(--forest); color: var(--ink); font-size: 14px; }
+.gbp-footer__inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4) var(--space-6); padding-top: var(--space-6); padding-bottom: var(--space-6); }
+.gbp-footer__inner img { height: 36px; width: auto; display: block; }
+.gbp-footer nav { display: flex; flex-wrap: wrap; gap: var(--space-5); }
+.gbp-footer__small { color: var(--ink-muted); }
+
+/* Phones */
+@media (max-width: 640px) {
+  .gbp-container { padding-left: var(--space-4); padding-right: var(--space-4); }
+  .gbp-site-header .gbp-search { flex-basis: 100%; max-width: none; }
+  .gbp-hero__ring { width: 200px; height: 200px; right: -110px; top: -90px; }
+  .gbp-hero__inner { padding-top: var(--space-6); padding-bottom: var(--space-7); }
+  .gbp-ph-title, .gbp-section > .gbp-ph .gbp-ph-title { font-size: 32px; }
+  .gbp-main__inner { gap: var(--space-7); padding-top: var(--space-7); }
+  .gbp-grid-2 { grid-template-columns: 1fr; }
+  .gbp-card { padding: var(--space-5); }
+  .gbp-stat-value { font-size: 56px; }
+  .gbp-hl-m { font-size: 32px; }
+  .gbp-cta__inner { padding-top: var(--space-7); padding-bottom: var(--space-7); gap: var(--space-6); }
+  .gbp-trend-axis span { writing-mode: vertical-rl; transform: rotate(180deg); justify-self: center; }
+  .gbp-trend-plot, .gbp-trend-axis { gap: 4px !important; }
+}

@@ -36,6 +36,71 @@ def _fmt_date_short(d: str | None) -> str:
         return d
 
 
+def _avg_days_rag(days) -> int | None:
+    if days is None:
+        return None
+    if days <= 30:
+        return 1
+    if days <= 60:
+        return 3
+    return 5
+
+
+def _pct_late_rag(pct) -> int | None:
+    if pct is None:
+        return None
+    if pct < 5:
+        return 1
+    if pct <= 20:
+        return 3
+    return 5
+
+
+def _rag_name(level: int | None) -> str:
+    return {1: "Excellent", 2: "Good", 3: "Fair", 4: "Poor", 5: "Very poor"}.get(level or 0, "")
+
+
+def _dist_badge(w30, p3160, pover60) -> tuple[int, str]:
+    segs = [
+        (w30 or 0, 1, "Mostly within 30 days"),
+        (p3160 or 0, 3, "Mostly 31 to 60 days"),
+        (pover60 or 0, 5, "Mostly over 60 days"),
+    ]
+    best = max(segs, key=lambda x: x[0])
+    return best[1], best[2]
+
+
+def _range_pos(days, max_days: float = 120) -> float:
+    if days is None:
+        return 0.0
+    return min(100.0, days / max_days * 100)
+
+
+def _fmt_int(val) -> int | None:
+    if val is None:
+        return None
+    try:
+        v = float(val)
+        if v != v:  # NaN check
+            return None
+        return int(round(v))
+    except (TypeError, ValueError):
+        return None
+
+
+def _fmt_pct(val) -> int | float | None:
+    if val is None:
+        return None
+    try:
+        v = float(val)
+        if v != v:  # NaN check
+            return None
+        r = round(v, 1)
+        return int(r) if r == int(r) else r
+    except (TypeError, ValueError):
+        return None
+
+
 def _avg_marker_pos(avg_days) -> float:
     """Band-proportional position (0–99%) for avg days on a 3-band scale (≤30/31–60/>60)."""
     if avg_days is None:
@@ -97,6 +162,13 @@ def build_site(
     env.globals["late_marker_pos"] = _late_marker_pos
     env.globals["SCALE_MAX"] = BENCHMARK_SCALE_MAX
     env.globals["range_term_max"] = _range_term_max
+    env.globals["avg_days_rag"] = _avg_days_rag
+    env.globals["pct_late_rag"] = _pct_late_rag
+    env.globals["rag_name"] = _rag_name
+    env.globals["dist_badge"] = _dist_badge
+    env.globals["range_pos"] = _range_pos
+    env.globals["fmt_int"] = _fmt_int
+    env.globals["fmt_pct"] = _fmt_pct
 
     search_json = json.dumps(search_index, separators=(",", ":"))
 
