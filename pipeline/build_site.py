@@ -142,7 +142,13 @@ def build_site(
     output_dir: Path,
     build_date: str | None = None,
 ) -> None:
-    build_date = build_date or date.today().isoformat()
+    if not build_date:
+        d = date.today()
+        build_date = d.strftime('%-d %B %Y')
+    elif len(build_date) == 10 and build_date[4] == '-':
+        # Convert ISO date to full format
+        d = date.fromisoformat(build_date)
+        build_date = d.strftime('%-d %B %Y')
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Static assets

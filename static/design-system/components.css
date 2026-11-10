@@ -1,4 +1,3 @@
-
 body { margin: 0; background: var(--surface); color: var(--ink); font-family: var(--font-sans); }
 .gbp-ground { background: var(--surface); color: var(--ink); }
 .gbp-row { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; }
@@ -39,7 +38,11 @@ body { margin: 0; background: var(--surface); color: var(--ink); font-family: va
 .gbp-search { display: flex; flex-direction: column; gap: var(--space-2); max-width: 760px; font-family: var(--font-sans); }
 .gbp-search-label { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--ink); }
 .gbp-search-pill { display: flex; align-items: center; gap: var(--space-3); background: var(--white); border-radius: var(--radius-pill); padding: 6px 6px 6px var(--space-5); min-height: 64px; box-sizing: border-box; box-shadow: inset 0 0 0 2px var(--search-edge); }
-.gbp-search-pill:focus-within { outline: 2px solid var(--focus); outline-offset: 3px; }
+/* Focus: a soft halo round the whole pill, no green ring. The input inside never draws its own outline. */
+.gbp-search-pill:focus-within { outline: none; box-shadow: inset 0 0 0 2px var(--search-edge), 0 0 0 4px rgba(255,255,255,.28); }
+[data-theme="light"] .gbp-search-pill:focus-within, .gbp-search-pill.gbp-on-light:focus-within { box-shadow: inset 0 0 0 2px var(--forest), 0 0 0 4px rgba(1,56,37,.15); }
+.gbp-search-input:focus, .gbp-search-input:focus-visible { outline: none; }
+.gbp-search-input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; margin-left: var(--space-2); cursor: pointer; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23013825' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E") center / 20px no-repeat; }
 .gbp-search-icon { flex: none; fill: none; stroke: var(--forest); stroke-width: 2.2; stroke-linecap: round; }
 .gbp-search-input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; font-family: var(--font-sans); font-size: 18px; line-height: 26px; color: var(--forest); }
 .gbp-search-input::placeholder { color: #4b6258; }
@@ -75,6 +78,24 @@ body { margin: 0; background: var(--surface); color: var(--ink); font-family: va
 .gbp-search-sm .gbp-search-input { font-size: 15px; line-height: 22px; }
 .gbp-search-btn-icon { width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; }
 .gbp-search-btn-icon .gbp-search-icon { stroke: var(--white); }
+
+/* Search results: left-aligned list of companies, one row per result, divided by hairlines */
+.gbp-results { max-width: 760px; font-family: var(--font-sans); color: var(--ink); }
+.gbp-results-count { margin: 0 0 var(--space-3); font-size: 15px; line-height: 22px; color: var(--ink-muted); }
+.gbp-results-count strong { color: var(--ink); font-weight: 600; }
+.gbp-results-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--hairline); }
+.gbp-results-item { border-bottom: 1px solid var(--hairline); }
+.gbp-results-link { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-4) var(--space-3); margin: 0 calc(-1 * var(--space-3)); color: var(--ink); text-decoration: none; }
+.gbp-results-link:hover { background: var(--surface-alt); }
+.gbp-results-link:hover .gbp-results-name { text-decoration: underline; text-underline-offset: 3px; }
+.gbp-results-link:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.gbp-results-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.gbp-results-name { font-size: 16px; line-height: 24px; font-weight: 600; letter-spacing: .01em; overflow-wrap: anywhere; }
+.gbp-results-meta { font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+.gbp-results-meta > span { display: inline-block; white-space: pre; }
+.gbp-results-arrow { flex: none; width: 20px; height: 20px; fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.gbp-results-note { margin: var(--space-4) 0 0; font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+.gbp-results-empty { margin: 0; padding: var(--space-5) 0; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); font-size: 16px; line-height: 24px; }
 
 /* Detail list */
 .gbp-dl { display: grid; gap: var(--space-5) var(--space-6); margin: 0; font-family: var(--font-sans); }

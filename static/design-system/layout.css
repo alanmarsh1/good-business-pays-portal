@@ -20,6 +20,9 @@ a:hover { color: var(--deep); }
 .gbp-site-header__logo { display: flex; }
 .gbp-site-header__logo img { height: 40px; width: auto; display: block; }
 .gbp-site-header .gbp-search { flex: 0 1 380px; }
+.gbp-site-header__nav { display: flex; gap: var(--space-5); font-size: 15px; font-weight: 600; }
+.gbp-site-header__nav a { text-decoration: none; }
+.gbp-site-header__nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* Hero: same deep green as the header, continuous with it. Signal ring bleeds off the top right. */
 .gbp-hero { background: var(--deep); color: var(--ink); position: relative; overflow: hidden; }
@@ -47,6 +50,10 @@ a:hover { color: var(--deep); }
 .gbp-ref { border-top: 1px solid var(--hairline); padding-top: var(--space-5); display: flex; flex-direction: column; gap: var(--space-4); }
 .gbp-ref__label { margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-muted); }
 .gbp-source { margin: 0; font-size: 12px; line-height: 18px; color: var(--ink-muted); }
+
+/* Search page: results sit on white, left-aligned under the hero, same 760px measure as the search pill */
+.gbp-main__inner--search { gap: var(--space-7); padding-top: var(--space-7); }
+.gbp-main__inner--search .gbp-source { max-width: 760px; }
 
 /* Closing campaign band */
 .gbp-cta { background: var(--deep); color: var(--ink); }

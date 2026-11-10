@@ -8,6 +8,8 @@
 
   if (!input || !results || typeof INDEX === 'undefined') return;
 
+  var ARROW = '<svg class="gbp-results-arrow" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>';
+
   // Show results for any query in the URL on page load
   var params = new URLSearchParams(window.location.search);
   var initial = params.get('q') || '';
@@ -65,8 +67,6 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
   }
-
-  var ARROW = '<svg class="gbp-results-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>';
 
   function render(q, items) {
     if (items === null) { results.innerHTML = ''; return; }
