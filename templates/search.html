@@ -2,7 +2,7 @@
 {% block title %}Good Business Pays — How quickly do companies pay?{% endblock %}
 
 {% block body %}
-<a class="gbp-skip" href="#main">Skip to search</a>
+<a class="gbp-skip" href="#main">Skip to the results</a>
 
 {# ── Site header ── #}
 <header class="gbp-site-header" data-theme="dark">
@@ -10,8 +10,8 @@
     <a class="gbp-site-header__logo" href="/" aria-label="Good Business Pays home">
       <img src="/static/design-system/logos/gbp-logo-reversed.png" alt="Good Business Pays">
     </a>
-    <nav aria-label="Site">
-      <a href="/about/" style="color:var(--ink);font-size:0.875rem;">About the data</a>
+    <nav class="gbp-site-header__nav" aria-label="Site">
+      <a href="/about/">About the data</a>
     </nav>
   </div>
 </header>
@@ -30,26 +30,20 @@
       <label for="search-input" class="gbp-search-label gbp-sr">Search by company name or number</label>
       <div class="gbp-search-pill">
         <input id="search-input" name="q" type="search" class="gbp-search-input"
-               placeholder="Company name or number…"
-               spellcheck="false">
-        <button type="submit" class="gbp-search-btn" aria-label="Search">Search</button>
+               placeholder="Company name or number" spellcheck="false">
+        <button type="submit" class="gbp-search-btn">Search</button>
       </div>
     </form>
   </div>
 </section>
 
 {# ── Results ── #}
-<main id="main" data-theme="light">
-  <section class="gbp-section" id="search-results" aria-live="polite" aria-label="Search results">
-    <div class="gbp-container">
-      <div id="results-inner"></div>
-    </div>
-  </section>
-
-  <div class="gbp-source" style="text-align:center;padding:var(--space-5) 0;">
-    Data from the <a href="https://check-payment-practices.service.gov.uk/" rel="noopener">UK government payment practices register</a>.
-    Updated monthly. <a href="/about/">About the data</a>.
-    Last updated: {{ build_date }}.
+<main id="main" class="gbp-main" data-theme="light">
+  <div class="gbp-container gbp-main__inner gbp-main__inner--search">
+    <section id="search-results" aria-live="polite" aria-label="Search results">
+      <div id="results-inner" class="gbp-results"></div>
+    </section>
+    <p class="gbp-source">Data from the <a href="https://check-payment-practices.service.gov.uk/" rel="noopener">UK government payment practices register</a>, updated monthly. <a href="/about/">About the data</a>. Last updated {{ build_date }}.</p>
   </div>
 </main>
 
@@ -66,6 +60,7 @@
       </div>
       <div class="gbp-cta__actions">
         <a href="https://www.goodbusinesspays.com/pledge" class="gbp-btn" rel="noopener">Make the pledge</a>
+        <a href="https://www.goodbusinesspays.com/pledge" rel="noopener">Is this your company? Pledge to pay faster</a>
       </div>
     </div>
   </div>

@@ -23,7 +23,7 @@
     <a class="gbp-site-header__logo" href="/" aria-label="Good Business Pays home">
       <img src="/static/design-system/logos/gbp-logo-reversed.png" alt="Good Business Pays">
     </a>
-    <form role="search" class="gbp-search gbp-search-sm" id="search-form" autocomplete="off">
+    <form role="search" class="gbp-search gbp-search-sm" id="search-form" autocomplete="off" action="/" method="get">
       <label for="q" class="gbp-search-label gbp-sr">Search for a company by name or number</label>
       <div class="gbp-search-pill">
         <input id="q" name="q" type="search" class="gbp-search-input" placeholder="Search company name or number" value="">
@@ -91,13 +91,13 @@
       <div class="gbp-grid-2">
 
         {# Time to pay #}
-        {% if r.avg_days is not none %}
-        {% set avg_band_idx = 0 if r.avg_days <= 30 else (1 if r.avg_days <= 60 else 2) %}
         <section class="gbp-card">
           <div class="gbp-card-head">
             <h3 class="gbp-card-title">Time to pay</h3>
             {% if avg_rag %}<span class="gbp-badge gbp-rag-{{ avg_rag }}">{{ rag_name(avg_rag) }}</span>{% endif %}
           </div>
+          {% if r.avg_days is not none %}
+          {% set avg_band_idx = 0 if r.avg_days <= 30 else (1 if r.avg_days <= 60 else 2) %}
           <div class="gbp-stat">
             <div class="gbp-stat-value">{{ fmt_int(r.avg_days) }} days</div>
             <div class="gbp-stat-label">Average time to pay an invoice.</div>
@@ -105,7 +105,7 @@
           <div class="gbp-bench gbp-bench-rag">
             <div class="gbp-bench-ends"><span>Faster</span><span>Slower</span></div>
             <div class="gbp-bench-row" role="img"
-                 aria-label="Average time to pay compared with the 30-day pledge: {{ fmt_int(r.avg_days) }} days{% if avg_rag %}, rated {{ rag_name(avg_rag) }}{% endif %}, in the band from {{ ['0','30','60'][avg_band_idx] }} to {{ ['30','60','> 60'][avg_band_idx] }} of 3 bands"
+                 aria-label="Average time to pay: {{ fmt_int(r.avg_days) }} days{% if avg_rag %}, rated {{ rag_name(avg_rag) }}{% endif %}"
                  style="grid-template-columns: repeat(3, minmax(0px, 1fr));">
               {% for bi, brag in [(0,1),(1,3),(2,5)] %}
               <div class="gbp-bench-cell">
@@ -119,17 +119,22 @@
             </div>
             {% if b and b.faster_than_pct is not none %}<p class="gbp-bench-caption">Pays faster than {{ b.faster_than_pct }}% of reporting companies.</p>{% endif %}
           </div>
+          {% else %}
+          <div class="gbp-stat">
+            <div class="gbp-stat-value gbp-stat-na">Not available</div>
+            <div class="gbp-stat-label">Average time to pay an invoice.</div>
+          </div>
+          {% endif %}
         </section>
-        {% endif %}
 
         {# Late payment #}
-        {% if r.pct_late is not none %}
-        {% set late_band_idx = 0 if r.pct_late < 5 else (1 if r.pct_late <= 20 else 2) %}
         <section class="gbp-card">
           <div class="gbp-card-head">
             <h3 class="gbp-card-title">Late payment</h3>
             {% if late_rag %}<span class="gbp-badge gbp-rag-{{ late_rag }}">{{ rag_name(late_rag) }}</span>{% endif %}
           </div>
+          {% if r.pct_late is not none %}
+          {% set late_band_idx = 0 if r.pct_late < 5 else (1 if r.pct_late <= 20 else 2) %}
           <div class="gbp-stat">
             <div class="gbp-stat-value">{{ fmt_pct(r.pct_late) }}%</div>
             <div class="gbp-stat-label">Of invoices paid outside agreed terms.</div>
@@ -137,7 +142,7 @@
           <div class="gbp-bench gbp-bench-rag">
             <div class="gbp-bench-ends"><span>Fewer late</span><span>More late</span></div>
             <div class="gbp-bench-row" role="img"
-                 aria-label="Share of invoices paid outside agreed terms: {{ fmt_pct(r.pct_late) }}% late{% if late_rag %}, rated {{ rag_name(late_rag) }}{% endif %}, in the band from {{ ['0%','5%','20%'][late_band_idx] }} to {{ ['5%','20%','100%'][late_band_idx] }} of 3 bands"
+                 aria-label="Share paid outside agreed terms: {{ fmt_pct(r.pct_late) }}%{% if late_rag %}, rated {{ rag_name(late_rag) }}{% endif %}"
                  style="grid-template-columns: repeat(3, minmax(0px, 1fr));">
               {% for bi, brag in [(0,1),(1,3),(2,5)] %}
               <div class="gbp-bench-cell">
@@ -150,8 +155,13 @@
               <span>0%</span><span>5%</span><span>20%<em>100%</em></span>
             </div>
           </div>
+          {% else %}
+          <div class="gbp-stat">
+            <div class="gbp-stat-value gbp-stat-na">Not available</div>
+            <div class="gbp-stat-label">Of invoices paid outside agreed terms.</div>
+          </div>
+          {% endif %}
         </section>
-        {% endif %}
 
       </div>{# /gbp-grid-2 #}
 
@@ -159,18 +169,18 @@
       <div class="gbp-grid-2">
 
         {# When are invoices paid? #}
-        {% if r.pct_within_30 is not none and r.pct_31_60 is not none and r.pct_over_60 is not none %}
-        {% set w30 = fmt_int(r.pct_within_30) %}
-        {% set p60 = fmt_int(r.pct_31_60) %}
-        {% set p90 = fmt_int(r.pct_over_60) %}
         <section class="gbp-card">
           <div class="gbp-card-head">
             <h3 class="gbp-card-title">When are invoices paid?</h3>
             {% if dist_lbl is defined %}<span class="gbp-badge gbp-rag-{{ dist_lv }}">{{ dist_lbl }}</span>{% endif %}
           </div>
+          {% if r.pct_within_30 is not none and r.pct_31_60 is not none and r.pct_over_60 is not none %}
+          {% set w30 = fmt_int(r.pct_within_30) %}
+          {% set p60 = fmt_int(r.pct_31_60) %}
+          {% set p90 = fmt_int(r.pct_over_60) %}
           <div class="gbp-dist">
             <div class="gbp-dist-bar" role="img"
-                 aria-label="{{ w30 }}% Within 30 days{% if r.value_within_30 %} · {{ r.value_within_30 | fmt_pounds }}{% endif %} ({{ rag_name(1) }}), {{ p60 }}% 31 to 60 days{% if r.value_31_60 %} · {{ r.value_31_60 | fmt_pounds }}{% endif %} ({{ rag_name(3) }}), {{ p90 }}% Over 60 days{% if r.value_over_60 %} · {{ r.value_over_60 | fmt_pounds }}{% endif %} ({{ rag_name(5) }})">
+                 aria-label="{{ w30 }}% Within 30 days, {{ p60 }}% 31 to 60 days, {{ p90 }}% Over 60 days">
               <div class="gbp-dist-seg gbp-rag-1 gbp-rag-fill" style="flex: {{ w30 }} 1 0%;">{% if w30 >= 8 %}{{ w30 }}%{% endif %}</div>
               <div class="gbp-dist-seg gbp-rag-3 gbp-rag-fill" style="flex: {{ p60 }} 1 0%;">{% if p60 >= 8 %}{{ p60 }}%{% endif %}</div>
               <div class="gbp-dist-seg gbp-rag-5 gbp-rag-fill" style="flex: {{ p90 }} 1 0%;">{% if p90 >= 8 %}{{ p90 }}%{% endif %}</div>
@@ -182,20 +192,25 @@
             </ul>
           </div>
           <p class="gbp-card-note">{{ w30 }}% of invoices are paid within the 30 days we campaign for.</p>
+          {% else %}
+          <div class="gbp-stat">
+            <div class="gbp-stat-value gbp-stat-na">Not available</div>
+            <div class="gbp-stat-label">Distribution of invoices by payment date.</div>
+          </div>
+          {% endif %}
         </section>
-        {% endif %}
 
         {# What payment terms are offered? #}
-        {% if r.shortest_period is not none %}
-        {% set short_pct = range_pos(r.shortest_period) %}
-        {% set long_pct  = range_pos(long_days) %}
-        {% set pledge_pct = range_pos(30) %}
-        {% set short_rag = avg_days_rag(r.shortest_period) %}
         <section class="gbp-card">
           <div class="gbp-card-head">
             <h3 class="gbp-card-title">What payment terms are offered?</h3>
             {% if terms_rag_lv %}<span class="gbp-badge gbp-rag-{{ terms_rag_lv }}">Up to {{ long_days }} days</span>{% endif %}
           </div>
+          {% if r.shortest_period is not none %}
+          {% set short_pct = range_pos(r.shortest_period) %}
+          {% set long_pct  = range_pos(long_days) %}
+          {% set pledge_pct = range_pos(30) %}
+          {% set short_rag = avg_days_rag(r.shortest_period) %}
           <div class="gbp-range" role="img"
                aria-label="Payment terms offered: Shortest {{ r.shortest_period }} days{% if long_days != r.shortest_period %}, Longest {{ long_days }} days{% endif %}. 30-day pledge 30 days">
             <div class="gbp-range-plot">
@@ -229,8 +244,13 @@
             <p class="gbp-details__body">{{ r.std_payment_terms }}</p>
           </details>
           {% endif %}
+          {% else %}
+          <div class="gbp-stat">
+            <div class="gbp-stat-value gbp-stat-na">Not available</div>
+            <div class="gbp-stat-label">Standard payment terms.</div>
+          </div>
+          {% endif %}
         </section>
-        {% endif %}
 
       </div>{# /gbp-grid-2 #}
 
