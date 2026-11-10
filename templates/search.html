@@ -2,10 +2,10 @@
 {% block title %}Search — Good Business Pays{% endblock %}
 
 {% block body %}
-<header class="site-header site-header--home">
+<header class="site-header">
   <div class="container site-header__inner">
     <a href="/" class="site-logo" aria-label="Good Business Pays home">
-      <img src="/static/logo.svg" alt="Good Business Pays" width="200" height="48">
+      {% include "_logo.html" %}
     </a>
     <nav class="site-nav" aria-label="Site">
       <a href="/about/">About the data</a>
@@ -51,7 +51,7 @@
 <footer class="site-footer">
   <div class="container site-footer__inner">
     <a href="/" class="site-logo site-logo--sm" aria-label="Good Business Pays home">
-      <img src="/static/logo.svg" alt="Good Business Pays" width="120" height="29">
+      {% include "_logo.html" %}
     </a>
     <p>Data under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="noopener">Open Government Licence v3.0</a></p>
   </div>

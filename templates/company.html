@@ -9,7 +9,7 @@
 <header class="site-header">
   <div class="container site-header__inner">
     <a href="/" class="site-logo" aria-label="Good Business Pays home">
-      <img src="/static/logo.svg" alt="Good Business Pays" width="160" height="38">
+      {% include "_logo.html" %}
     </a>
     <form class="search-field search-field--sm" role="search" id="search-form" autocomplete="off">
       <label class="sr-only" for="search-compact">Search companies</label>
@@ -20,25 +20,28 @@
   </div>
 </header>
 
+{# ── 2. Company hero (dark band) ── #}
+<section class="company-hero">
+  <div class="container company-hero__inner">
+    <a href="/" class="company-hero__back">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+      Back to search
+    </a>
+    <h1 class="company-hero__name">{{ c.company_name }}</h1>
+    <div class="company-hero__meta">
+      <span>Company {{ c.company_number }}</span>
+      {%- if c.ch and c.ch.sector %}<span>{{ c.ch.sector }}</span>{% endif -%}
+      {%- if c.ch and c.ch.locality %}<span>{{ c.ch.locality }}</span>{% endif -%}
+      {%- if r.end_date %}<span>Period ending {{ r.end_date | fmt_date }}</span>{% endif -%}
+    </div>
+    {% if r.url %}
+    <a href="{{ r.url }}" rel="noopener" class="company-hero__official">View official report ↗</a>
+    {% endif %}
+  </div>
+</section>
+
 <main id="main">
   <div class="container">
-
-    {# ── 2. Company name and period ── #}
-    <div class="page-heading">
-      <h1 class="page-heading__title">{{ c.company_name }}</h1>
-      <p class="page-heading__meta">
-        Company {{ c.company_number -}}
-        {%- if c.ch and c.ch.sector %} · {{ c.ch.sector }}{% endif -%}
-        {%- if c.ch and c.ch.locality %} · {{ c.ch.locality }}{% endif -%}
-        {% if r.end_date %} · Period ending {{ r.end_date | fmt_date }}{% endif -%}
-        {% if r.filing_date %} · Filed {{ r.filing_date | fmt_date }}{% endif %}
-      </p>
-      {% if r.url %}
-      <p class="page-heading__link">
-        <a href="{{ r.url }}" rel="noopener" class="external-link">View official report ↗</a>
-      </p>
-      {% endif %}
-    </div>
 
     {# ── Status warning for dissolved / in-administration companies ── #}
     {% if c.ch and c.ch.status and c.ch.status != 'active' %}
@@ -359,7 +362,7 @@
 <footer class="site-footer">
   <div class="container site-footer__inner">
     <a href="/" class="site-logo site-logo--sm" aria-label="Good Business Pays home">
-      <img src="/static/logo.svg" alt="Good Business Pays" width="120" height="29">
+      {% include "_logo.html" %}
     </a>
     <p>Data under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="noopener">Open Government Licence v3.0</a></p>
   </div>
