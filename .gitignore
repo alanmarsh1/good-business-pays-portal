@@ -4,6 +4,8 @@ logs/
 __pycache__/
 .env
 *.csv
+!data/awards.csv
+!data/certifications.csv
 *.zip
 data/companies/
 data/search_index.json

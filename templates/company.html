@@ -61,6 +61,11 @@
           {%- endif %}
         </div>
       </div>
+      <div style="margin-top:24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding:16px 20px;border:1px solid rgba(255,255,255,0.28);max-width:760px;">
+        <span style="display:inline-flex;align-items:center;gap:8px;font-size:15px;line-height:22px;font-weight:600;color:#ffffff;"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#00ff7f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16.5v.5"></path></svg>Unclaimed profile</span>
+        <span style="flex:1 1 260px;font-size:15px;line-height:22px;color:#b7cfc4;">Nobody from {{ c.company_name }} has added the company&#8217;s side of the story yet.</span>
+        <a class="gbp-btn" href="/claim/{{ c.company_number }}">Claim this profile, free</a>
+      </div>
     </div>
   </div>
 </section>
@@ -69,10 +74,33 @@
 <main id="main" class="gbp-main" data-theme="light">
   <div class="gbp-container gbp-main__inner">
 
+{# ── Recognition row (Fast Payer Award shields + Customer of Choice) ── #}
+{% if c.award_years %}
+<section aria-label="Recognition" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(380px, 1fr));gap:16px;align-items:stretch;">
+  <section class="gbp-coc" data-theme="dark" style="grid-template-columns:136px minmax(0,1fr);gap:28px;padding:32px;">
+    <svg width="136" height="136" viewBox="0 0 136 136" role="img" aria-label="Customer of Choice seal, not yet earned"><circle cx="68" cy="68" r="62" fill="none" stroke="#d8b25c" stroke-width="2" stroke-dasharray="6 7"></circle><rect x="50" y="62" width="36" height="28" rx="3" fill="none" stroke="#d8b25c" stroke-width="2.4"></rect><path d="M57 62v-8a11 11 0 0 1 22 0v8" fill="none" stroke="#d8b25c" stroke-width="2.4"></path></svg>
+    <div>
+      <h3 style="color:#e2c172;">Customer of Choice<br>not assessed</h3>
+      <p>{{ c.company_name }} has not yet taken the assessment that checks how a company treats its suppliers beyond payment.</p>
+      <a href="/claim/{{ c.company_number }}#assessment" style="display:inline-flex;align-items:center;gap:6px;margin-top:16px;font-size:15px;line-height:22px;font-weight:600;color:#ffffff;text-decoration:underline;text-decoration-color:#d8b25c;text-underline-offset:4px;">Is this your company? Unlock the assessment<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#d8b25c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+    </div>
+  </section>
+  <section class="gbp-card" style="padding:32px;gap:24px;justify-content:center;">
+    <div><h3 class="gbp-card-title">Fast Payer Award</h3><p class="gbp-card-note" style="margin:4px 0 0;">{{ c.award_years | length }} year{% if c.award_years | length != 1 %}s{% endif %} running, from the company&#8217;s own published payment data.</p></div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;">
+      {%- for year in c.award_years %}
+      <img src="/static/design-system/images/fast-payer-{{ year }}.png" alt="Fast Payer Award {{ year }}" width="84" height="114">
+      {%- endfor %}
+    </div>
+  </section>
+</section>
+{% endif %}
+
 {# ── Payment ranking panel (Good Business Partners data) ── #}
 {% if c.gbp %}
 {% set g = c.gbp %}
 {% set band_name = g.band %}
+{%- set band_display = "Recognised" if band_name == "Accredited" else band_name -%}
 {%- if band_name == "Platinum" -%}
   {%- set band_bg = "#f2f5f7" -%}{%- set pill_bg = "#c3ccd3" -%}{%- set active_col = "#a9b4bd" -%}
 {%- elif band_name == "Gold" -%}
@@ -85,12 +113,12 @@
     <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;">
       <span style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 10px;border-radius:999px;background:{{ pill_bg }};color:#013825;font:700 13px/18px var(--font-sans);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#013825" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"></circle><path d="M8.5 10L6 3h4l2 4 2-4h4l-2.5 7"></path></svg>
-        {{ band_name }} Fast Payer
+        {{ band_display }} Fast Payer
       </span>
       {% if g.awaiting_data %}
-      <span style="font-size:15px;line-height:22px;">Ranked in the {{ band_name }} band. Payment data is awaiting an updated filing.</span>
+      <span style="font-size:15px;line-height:22px;">Ranked in the {{ band_display }} band. Payment data is awaiting an updated filing.</span>
       {% else %}
-      <span style="font-size:15px;line-height:22px;">Ranked in the {{ band_name }} band{% if band_name == "Platinum" %}, the highest,{% endif %} with a score of <b>{{ g.score }} out of 100</b>.</span>
+      <span style="font-size:15px;line-height:22px;">Ranked in the {{ band_display }} band{% if band_name == "Platinum" %}, the highest,{% endif %} with a score of <b>{{ g.score }} out of 100</b>.</span>
       {% endif %}
     </div>
     {% if not g.awaiting_data and g.score is not none %}
@@ -105,7 +133,7 @@
       </div>
       <div style="display:grid;grid-template-columns:50fr 30fr 12fr 8fr;gap:4px;margin-top:10px;">
         <div style="font-size:13px;line-height:18px;color:var(--ink-muted);">Not ranked<br><span style="font-weight:400;">Below 50</span></div>
-        <div style="font-size:13px;line-height:18px;color:{% if band_name == 'Accredited' %}var(--ink);font-weight:700{% else %}var(--ink-muted){% endif %};">Accredited<br><span style="font-weight:400;">50 to 79</span></div>
+        <div style="font-size:13px;line-height:18px;color:{% if band_name == 'Accredited' %}var(--ink);font-weight:700{% else %}var(--ink-muted){% endif %};">Recognised<br><span style="font-weight:400;">50 to 79</span></div>
         <div style="font-size:13px;line-height:18px;color:{% if band_name == 'Gold' %}var(--ink);font-weight:700{% else %}var(--ink-muted){% endif %};">Gold<br><span style="font-weight:400;">80 to 91</span></div>
         <div style="font-size:13px;line-height:18px;color:{% if band_name == 'Platinum' %}var(--ink);font-weight:700{% else %}var(--ink-muted){% endif %};">Platinum<br><span style="font-weight:400;">92+</span></div>
       </div>
@@ -365,6 +393,19 @@
     </section>
 
     <p class="gbp-source">Payment figures as reported by the company under the UK payment practices reporting duty. Contains public sector information licensed under the Open Government Licence v3.0.</p>
+
+    <section class="gbp-claim" aria-labelledby="claimh">
+      <div>
+        <h2 id="claimh">Your suppliers are already reading this page</h2>
+        <p>Claim it for free in about five minutes. Tell suppliers how to get paid, and comment on each reporting period. Your figures and ratings stay exactly as filed.</p>
+        <ul>
+          <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Free, verified with your work email</li>
+          <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>See how many suppliers visit each month</li>
+          <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Start the Customer of Choice assessment when you are ready</li>
+        </ul>
+      </div>
+      <a class="gbp-btn-solid" href="/claim/{{ c.company_number }}">Claim this profile</a>
+    </section>
 
   </div>{# /gbp-main__inner #}
 </main>
