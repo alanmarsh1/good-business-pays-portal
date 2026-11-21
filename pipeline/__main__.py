@@ -6,6 +6,7 @@ from pathlib import Path
 from .validate import load_export, validate_export, save_baseline
 from .process import process_export
 from .build_site import build_site
+from .sci_payment import enrich_companies
 
 
 def main():
@@ -50,6 +51,9 @@ def main():
     print("Processing …")
     companies, search_index = process_export(df, ch_data=ch_data)
     print(f"  {len(companies):,} companies")
+    enrich_companies(companies)
+    gbp_count = sum(1 for c in companies.values() if c.get("gbp"))
+    print(f"  {gbp_count} companies matched to Good Business Partners data")
 
     print(f"Building site → {output_path} …")
     build_site(companies, search_index, output_path, build_date=args.build_date)

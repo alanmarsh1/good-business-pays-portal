@@ -69,6 +69,53 @@
 <main id="main" class="gbp-main" data-theme="light">
   <div class="gbp-container gbp-main__inner">
 
+{# ── Payment ranking panel (Good Business Partners data) ── #}
+{% if c.gbp %}
+{% set g = c.gbp %}
+{% set band_name = g.band %}
+{%- if band_name == "Platinum" -%}
+  {%- set band_bg = "#f2f5f7" -%}{%- set pill_bg = "#c3ccd3" -%}{%- set active_col = "#a9b4bd" -%}
+{%- elif band_name == "Gold" -%}
+  {%- set band_bg = "#fbf5e4" -%}{%- set pill_bg = "#d8b25c" -%}{%- set active_col = "#d8b25c" -%}
+{%- else -%}
+  {%- set band_bg = "var(--surface-alt)" -%}{%- set pill_bg = "#bdeccf" -%}{%- set active_col = "#3fbf7f" -%}
+{%- endif -%}
+<section class="gbp-section" aria-labelledby="gbp-rank">
+  <section class="gbp-card" aria-label="Payment ranking" style="padding:24px 32px;gap:28px;background:{{ band_bg }};">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;">
+      <span style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 10px;border-radius:999px;background:{{ pill_bg }};color:#013825;font:700 13px/18px var(--font-sans);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#013825" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"></circle><path d="M8.5 10L6 3h4l2 4 2-4h4l-2.5 7"></path></svg>
+        {{ band_name }} Fast Payer
+      </span>
+      {% if g.awaiting_data %}
+      <span style="font-size:15px;line-height:22px;">Ranked in the {{ band_name }} band. Payment data is awaiting an updated filing.</span>
+      {% else %}
+      <span style="font-size:15px;line-height:22px;">Ranked in the {{ band_name }} band{% if band_name == "Platinum" %}, the highest,{% endif %} with a score of <b>{{ g.score }} out of 100</b>.</span>
+      {% endif %}
+    </div>
+    {% if not g.awaiting_data and g.score is not none %}
+    <div>
+      <div style="position:relative;display:grid;grid-template-columns:50fr 30fr 12fr 8fr;gap:4px;margin-top:8px;">
+        <div style="height:10px;background:{% if band_name not in ('Platinum','Gold','Accredited') %}#9aa3a0{% else %}#e4e4e4{% endif %};"></div>
+        <div style="height:10px;background:{% if band_name == 'Accredited' %}{{ active_col }}{% else %}#d3eedd{% endif %};"></div>
+        <div style="height:10px;background:{% if band_name == 'Gold' %}{{ active_col }}{% else %}#f0e3bd{% endif %};"></div>
+        <div style="height:10px;background:{% if band_name == 'Platinum' %}{{ active_col }}{% else %}#e3e8ec{% endif %};"></div>
+        <div style="position:absolute;left:{{ g.score }}%;top:-6px;width:4px;height:22px;margin-left:-2px;background:#013825;" title="Score {{ g.score }}"></div>
+        <div style="position:absolute;left:{{ g.score }}%;top:-30px;transform:translateX(-50%);font:700 13px/18px var(--font-sans);color:#013825;white-space:nowrap;">{{ g.score }}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:50fr 30fr 12fr 8fr;gap:4px;margin-top:10px;">
+        <div style="font-size:13px;line-height:18px;color:var(--ink-muted);">Not ranked<br><span style="font-weight:400;">Below 50</span></div>
+        <div style="font-size:13px;line-height:18px;color:{% if band_name == 'Accredited' %}var(--ink);font-weight:700{% else %}var(--ink-muted){% endif %};">Accredited<br><span style="font-weight:400;">50 to 79</span></div>
+        <div style="font-size:13px;line-height:18px;color:{% if band_name == 'Gold' %}var(--ink);font-weight:700{% else %}var(--ink-muted){% endif %};">Gold<br><span style="font-weight:400;">80 to 91</span></div>
+        <div style="font-size:13px;line-height:18px;color:{% if band_name == 'Platinum' %}var(--ink);font-weight:700{% else %}var(--ink-muted){% endif %};">Platinum<br><span style="font-weight:400;">92+</span></div>
+      </div>
+    </div>
+    {% endif %}
+    <p style="font-size:13px;color:var(--ink-muted);margin:0;">Score on <a href="https://www.goodbusinesspartners.com/companies/{{ g.slug }}" rel="noopener" style="color:inherit;">Good Business Partners</a>{% if g.band_since %} · Confirmed {{ g.band_since | fmt_date }}{% endif %}</p>
+  </section>
+</section>
+{% endif %}
+
     {% if r.no_payments %}
     {# ── No-payments notice ── #}
     <section class="gbp-section">
