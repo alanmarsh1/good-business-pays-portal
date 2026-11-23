@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}For companies — Good Business Pays{% endblock %}
+
+{% block body %}
+<a class="gbp-skip" href="#main">Skip to content</a>
+
+<header class="gbp-site-header" data-theme="dark">
+  <div class="gbp-container gbp-site-header__inner">
+    <a class="gbp-site-header__logo" href="/" aria-label="Good Business Pays home">
+      <img src="/static/design-system/logos/gbp-logo-reversed.png" alt="Good Business Pays">
+    </a>
+    <nav class="gbp-site-header__nav" aria-label="Site">
+      <a href="/search/">Check a company</a>
+      <a href="/directory/">Directory</a>
+      <a href="/for-companies/">For companies</a>
+      <a href="/methodology/">How recognition works</a>
+      <a href="/about/">About the data</a>
+    </nav>
+  </div>
+</header>
+
+<section class="gbp-hero gbp-hero--wide" data-theme="dark">
+  <svg class="gbp-hero__ring" viewBox="0 0 380 380" aria-hidden="true"><circle cx="190" cy="190" r="150"></circle></svg>
+  <div class="gbp-container gbp-hero__inner">
+    <div class="gbp-hero__heading">
+      <div class="gbp-ph">
+        <div class="gbp-ph-eyebrow">For companies</div>
+        <h1 class="gbp-ph-title">Your suppliers are already checking</h1>
+      </div>
+      <p class="gbp-hero-lede">Every UK company that reports its payment practices already has a public profile here. Claim yours for free to add your side of the story, then show suppliers everything that makes you a good customer.</p>
+    </div>
+    <form role="search" class="gbp-search" action="/search/" method="get">
+      <label for="cq" class="gbp-search-label gbp-sr">Find your company by name or number</label>
+      <div class="gbp-search-pill">
+        <input id="cq" name="q" type="search" class="gbp-search-input" placeholder="Find your company by name or number">
+        <button type="submit" class="gbp-search-btn">Find my company</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<main id="main" class="gbp-main" data-theme="light">
+  <div class="gbp-container gbp-main__inner">
+
+    <section class="gbp-section">
+      <div class="gbp-ph">
+        <h2 class="gbp-ph-title">From listed to accredited</h2>
+        <div class="gbp-ph-meta">Every company that files payment reports is listed automatically. Claiming your profile is free. Accreditation follows an independent assessment and carries an annual fee.</div>
+      </div>
+      <div class="gbp-tiers">
+
+        <section class="gbp-tier">
+          <div class="gbp-tier-incl">Automatic</div>
+          <h3>Listed</h3>
+          <div class="gbp-tier-price">Free, no action needed</div>
+          <p>Every company that files payment practice reports.</p>
+          <ul>
+            <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>Payment report built from the company's own government filings</span></li>
+            <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>Ratings against the 30-day pledge, with the full payment history</span></li>
+            <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>Fast Payer Award and tier, when the data earns them</span></li>
+          </ul>
+        </section>
+
+        <section class="gbp-tier">
+          <div class="gbp-tier-incl">Everything in Listed, plus</div>
+          <h3>Claimed</h3>
+          <div class="gbp-tier-price">Free</div>
+          <p>Verify that you represent the company and help suppliers work with you.</p>
+          <ul>
+            <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>Verified "Claimed" mark and a link to your website</span></li>
+            <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>How to get paid on time: invoicing rules, contacts and supplier portal</span></li>
+            <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>Comment on each reporting period, shown beside the figures</span></li>
+            <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>Preview each new filing before it goes live, and a monthly count of supplier visits</span></li>
+          </ul>
+          <a class="gbp-btn-solid" href="/search/">Claim your free profile</a>
+        </section>
+
+        <section class="gbp-tier gbp-tier-feature" data-theme="dark">
+          <div class="gbp-tier-incl">Independently assessed</div>
+          <h3>Accredited Good Business Partner</h3>
+          <div class="gbp-tier-price">[PRICE] a year, including assessment</div>
+          <p>Proof, checked by someone else, that you are a customer suppliers would choose.</p>
+          <ul>
+            <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>A full profile that brings all your credentials together in one place</span></li>
+            <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>Customer of Choice certification through the independent diagnostic</span></li>
+            <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>Results from an independent survey of your suppliers</span></li>
+            <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>Credentials section: policies, SME terms, pledge and award history</span></li>
+            <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>Verifiable badge and certificate for your website, bids and tenders</span></li>
+            <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg><span>Detailed analytics: who is looking, by sector and region</span></li>
+          </ul>
+          <a class="gbp-btn" href="mailto:info@goodbusinesspays.com">Apply for accreditation</a>
+        </section>
+
+      </div>
+    </section>
+
+    <section class="gbp-promise" aria-labelledby="promise">
+      <div>
+        <h3 id="promise">What money never changes</h3>
+        <p>Your figures and ratings come only from your filings. Paying for a profile cannot change them, hide them or move you up the directory.</p>
+      </div>
+      <div>
+        <h3>Your right of reply</h3>
+        <p>Every claimed company can comment on each reporting period. Comments sit beside the figures and are labelled as yours.</p>
+      </div>
+      <div>
+        <h3>Recognition is earned</h3>
+        <p>Fast Payer Awards and tiers come from the data. Certification comes from an independent diagnostic, not from a fee alone.</p>
+      </div>
+    </section>
+
+    <section class="gbp-section" id="claim">
+      <div class="gbp-ph">
+        <h2 class="gbp-ph-title">Claim in three steps</h2>
+        <div class="gbp-ph-meta">Most profiles are live within one working day.</div>
+      </div>
+      <ol class="gbp-steps">
+        <li><b>Find your company</b>Search by name or Companies House number.</li>
+        <li><b>Verify it's you</b>Use an email address on your company's own domain. We confirm it against the company's registered details.</li>
+        <li><b>Add your details</b>Logo, introduction and how suppliers get paid. Upgrade to a Good Business Partner profile at any time.</li>
+      </ol>
+    </section>
+
+  </div>
+</main>
+
+<footer class="gbp-footer" data-theme="dark">
+  <div class="gbp-container gbp-footer__inner">
+    <img src="/static/design-system/logos/gbp-mark-green.png" alt="Good Business Pays">
+    <nav aria-label="Footer">
+      <a href="/about/">About the data</a>
+      <a href="/methodology/">How recognition works</a>
+      <a href="https://www.goodbusinesspays.com/privacy" rel="noopener">Privacy</a>
+      <a href="mailto:info@goodbusinesspays.com">Contact</a>
+    </nav>
+    <span class="gbp-footer__small">© Good Business Pays CIC</span>
+  </div>
+</footer>
+{% endblock %}

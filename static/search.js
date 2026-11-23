@@ -21,13 +21,13 @@
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var q = input.value.trim();
-    history.replaceState(null, '', q ? '/?q=' + encodeURIComponent(q) : '/');
+    history.replaceState(null, '', q ? '/search/?q=' + encodeURIComponent(q) : '/search/');
     render(q, search(q));
   });
 
   input.addEventListener('input', function () {
     var q = input.value.trim();
-    history.replaceState(null, '', q ? '/?q=' + encodeURIComponent(q) : '/');
+    history.replaceState(null, '', q ? '/search/?q=' + encodeURIComponent(q) : '/search/');
     render(q, search(q));
   });
 

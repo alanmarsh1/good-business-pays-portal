@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}How recognition works — Good Business Pays{% endblock %}
+
+{% block body %}
+<a class="gbp-skip" href="#main">Skip to content</a>
+
+<header class="gbp-site-header" data-theme="dark">
+  <div class="gbp-container gbp-site-header__inner">
+    <a class="gbp-site-header__logo" href="/" aria-label="Good Business Pays home">
+      <img src="/static/design-system/logos/gbp-logo-reversed.png" alt="Good Business Pays">
+    </a>
+    <nav class="gbp-site-header__nav" aria-label="Site">
+      <a href="/search/">Check a company</a>
+      <a href="/directory/">Directory</a>
+      <a href="/for-companies/">For companies</a>
+      <a href="/methodology/">How recognition works</a>
+      <a href="/about/">About the data</a>
+    </nav>
+  </div>
+</header>
+
+<section class="gbp-hero" data-theme="dark">
+  <svg class="gbp-hero__ring" viewBox="0 0 380 380" aria-hidden="true"><circle cx="190" cy="190" r="150"></circle></svg>
+  <div class="gbp-container gbp-hero__inner">
+    <div class="gbp-hero__heading">
+      <div class="gbp-ph">
+        <h1 class="gbp-ph-title">How recognition works</h1>
+        <div class="gbp-ph-meta">Every score, award and certification comes from verifiable data, not from a fee.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main id="main" class="gbp-main" data-theme="light">
+  <div class="gbp-container gbp-main__inner">
+
+    <section class="gbp-section" aria-labelledby="score">
+      <div class="gbp-ph">
+        <h2 id="score" class="gbp-ph-title">The payment score</h2>
+        <div class="gbp-ph-meta">A single score from 0 to 100 that summarises how well a company pays its suppliers.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;">
+        <section class="gbp-card" style="gap: 12px;">
+          <h3 class="gbp-card-title">Speed (A1)</h3>
+          <p class="gbp-card-note" style="margin: 0;">Based on average days to pay. Full marks (100) for paying within the same day, zero for taking 50 days or more. The score falls sharply for payments beyond 30 days.</p>
+        </section>
+        <section class="gbp-card" style="gap: 12px;">
+          <h3 class="gbp-card-title">On time (A2)</h3>
+          <p class="gbp-card-note" style="margin: 0;">The percentage of invoices paid within 30 days, taken directly from the company's filing. This sub-score rewards the businesses that actually hit the 30-day target.</p>
+        </section>
+        <section class="gbp-card" style="gap: 12px;">
+          <h3 class="gbp-card-title">On terms (A3)</h3>
+          <p class="gbp-card-note" style="margin: 0;">Whether invoices are paid within the agreed terms. Capped at 60 if the standard terms exceed 30 days, or zero if terms exceed 60 days.</p>
+        </section>
+      </div>
+      <div class="gbp-promise" style="margin-top: var(--space-6);">
+        <div>
+          <h3>How the score is calculated</h3>
+          <p>The three sub-scores (A1, A2, A3) are averaged to give the final payment score. The score is recalculated each time new filing data is published.</p>
+        </div>
+        <div>
+          <h3>Where the data comes from</h3>
+          <p>All figures come from the company's own mandatory filing to the UK government's payment practices register. We do not adjust or supplement them.</p>
+        </div>
+        <div>
+          <h3>When scores change</h3>
+          <p>Scores update whenever the government register publishes a new reporting period. Historical scores are preserved so you can see how a company has changed over time.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="gbp-section" aria-labelledby="bands">
+      <div class="gbp-ph">
+        <h2 id="bands" class="gbp-ph-title">Recognition bands</h2>
+        <div class="gbp-ph-meta">A score threshold determines which companies qualify for a Fast Payer Award, and at which tier.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;">
+        <section class="gbp-card" style="gap: 12px; background: var(--surface-alt);">
+          <h3 class="gbp-card-title" style="font-size: 20px;">Platinum</h3>
+          <p class="gbp-card-note" style="margin: 0;"><strong>Score 92 or above.</strong> The highest tier, awarded to companies that consistently pay suppliers very quickly and almost always within 30 days.</p>
+        </section>
+        <section class="gbp-card" style="gap: 12px; background: var(--surface-alt);">
+          <h3 class="gbp-card-title" style="font-size: 20px;">Gold</h3>
+          <p class="gbp-card-note" style="margin: 0;"><strong>Score 80 to 91.</strong> Strong payment performance across all three measures. Gold companies pay quickly and reliably on the agreed terms.</p>
+        </section>
+        <section class="gbp-card" style="gap: 12px; background: var(--surface-alt);">
+          <h3 class="gbp-card-title" style="font-size: 20px;">Recognised</h3>
+          <p class="gbp-card-note" style="margin: 0;"><strong>Score 50 to 79.</strong> Above-average payment performance, recognised with a Fast Payer Award. These companies pay better than most of the market.</p>
+        </section>
+      </div>
+    </section>
+
+    <section class="gbp-section" aria-labelledby="awards">
+      <div class="gbp-ph">
+        <h2 id="awards" class="gbp-ph-title">Fast Payer Awards</h2>
+        <div class="gbp-ph-meta">Annual awards given to companies that have earned a qualifying payment score.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+        <section class="gbp-card" style="gap: 12px;">
+          <img src="/static/design-system/images/fast-payer-2026.png" alt="Fast Payer Award 2026" width="64" height="87">
+          <h3 class="gbp-card-title">Who qualifies</h3>
+          <p class="gbp-card-note" style="margin: 0;">Any company that files payment data with the UK government and whose score reaches the Recognised threshold (50 or above) in the year of the award. The award is based on the most recent 12-month reporting period.</p>
+        </section>
+        <section class="gbp-card" style="gap: 12px;">
+          <h3 class="gbp-card-title">What it means</h3>
+          <p class="gbp-card-note" style="margin: 0;">The award year is printed on the shield. A company can hold awards from multiple years. Awards from the most recent two years appear on the company's profile as active recognition; older awards are shown for the historical record.</p>
+        </section>
+      </div>
+    </section>
+
+    <section class="gbp-section" aria-labelledby="accreditation">
+      <div class="gbp-ph">
+        <h2 id="accreditation" class="gbp-ph-title">Accreditation and Customer of Choice</h2>
+        <div class="gbp-ph-meta">The step beyond the award, for companies that want independent proof of how they treat suppliers.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+        <section class="gbp-card" style="gap: 12px;">
+          <img src="/static/design-system/images/customer-of-choice-seal-2026.png" alt="Certified Customer of Choice seal" width="80" height="80">
+          <h3 class="gbp-card-title">Customer of Choice diagnostic</h3>
+          <p class="gbp-card-note" style="margin: 0;">Gold and Platinum Fast Payers who want full accreditation complete the Customer of Choice diagnostic: an independent assessment of 13 supplier practices covering everything from payment terms to communication and invoicing simplicity.</p>
+        </section>
+        <section class="gbp-card" style="gap: 12px;">
+          <h3 class="gbp-card-title">What accreditation covers</h3>
+          <p class="gbp-card-note" style="margin: 0;">Accredited Good Business Partners have passed the diagnostic, carried a supplier survey, and had their credentials independently reviewed. The accreditation is annual and must be renewed. It cannot be bought without the diagnostic.</p>
+        </section>
+      </div>
+    </section>
+
+    <section class="gbp-claim" aria-labelledby="data-source">
+      <div>
+        <h2 id="data-source">The data never lies</h2>
+        <p>All payment figures come from mandatory government filings. A company's score, its band and its position in the directory are set only by what it reported to government. Claiming a profile or paying for accreditation cannot change any figure.</p>
+        <ul>
+          <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Source: UK government payment practices register</li>
+          <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Updated monthly as new filings are published</li>
+          <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Last updated {{ build_date }}</li>
+        </ul>
+      </div>
+      <a class="gbp-btn-solid" href="/search/">Search payment records</a>
+    </section>
+
+  </div>
+</main>
+
+<footer class="gbp-footer" data-theme="dark">
+  <div class="gbp-container gbp-footer__inner">
+    <img src="/static/design-system/logos/gbp-mark-green.png" alt="Good Business Pays">
+    <nav aria-label="Footer">
+      <a href="/about/">About the data</a>
+      <a href="/methodology/">How recognition works</a>
+      <a href="https://www.goodbusinesspays.com/privacy" rel="noopener">Privacy</a>
+      <a href="mailto:info@goodbusinesspays.com">Contact</a>
+    </nav>
+    <span class="gbp-footer__small">© Good Business Pays CIC</span>
+  </div>
+</footer>
+{% endblock %}

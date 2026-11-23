@@ -136,6 +136,106 @@ def _range_term_max(r: dict) -> int:
     return max(max(vals, default=90), 90)
 
 
+def _float_or_none(v) -> float | None:
+    """Convert a value to float, returning None for None/NaN."""
+    if v is None:
+        return None
+    try:
+        f = float(v)
+        return None if f != f else f  # NaN check
+    except (TypeError, ValueError):
+        return None
+
+
+def _compact_num(v: float | None) -> int | float | None:
+    """Round to 1dp, return int if whole number."""
+    if v is None:
+        return None
+    r = round(v, 1)
+    return int(r) if r == int(r) else r
+
+
+def _build_directory_data(companies: dict) -> tuple[list[dict], list[str]]:
+    """Build JSON rows for companies with Fast Payer Awards.
+    Returns (rows sorted A–Z, sorted unique sector list).
+    """
+    rows: list[dict] = []
+    sectors: set[str] = set()
+
+    for number, c in companies.items():
+        if not c.get("award_years"):
+            continue
+
+        trend = c.get("trend", [])
+
+        # Latest report stats
+        avg = late = None
+        if trend:
+            latest = trend[-1]
+            avg  = _compact_num(_float_or_none(latest.get("avg_days")))
+            late = _compact_num(_float_or_none(latest.get("pct_late")))
+
+        # Trend direction: compare all avg_days from first to last
+        trend_dir = "stable"
+        if len(trend) >= 2:
+            first_avg = last_avg = None
+            for period in trend:
+                f = _float_or_none(period.get("avg_days"))
+                if f is not None:
+                    if first_avg is None:
+                        first_avg = f
+                    last_avg = f
+            if first_avg and last_avg and first_avg > 0:
+                ratio = last_avg / first_avg
+                if ratio < 0.85:
+                    trend_dir = "improving"
+                elif ratio > 1.15:
+                    trend_dir = "declining"
+
+        # First filing year
+        since: int | None = None
+        if trend:
+            start_date = trend[0].get("start_date", "")
+            if start_date:
+                try:
+                    since = int(str(start_date)[:4])
+                except (ValueError, IndexError):
+                    pass
+
+        # Band from SCI data ("Accredited" → display as "Recognised")
+        band: str | None = None
+        gbp = c.get("gbp")
+        if gbp:
+            raw = gbp.get("band", "")
+            if raw == "Accredited":
+                band = "Recognised"
+            elif raw in ("Platinum", "Gold"):
+                band = raw
+
+        # Sector from CH cache
+        sector: str | None = None
+        ch = c.get("ch") or {}
+        s = ch.get("sector")
+        if s:
+            sector = s
+            sectors.add(s)
+
+        rows.append({
+            "n":       number,
+            "name":    c.get("company_name", ""),
+            "avg":     avg,
+            "late":    late,
+            "band":    band,
+            "sector":  sector,
+            "reports": c.get("reports_count", 0),
+            "since":   since,
+            "trend":   trend_dir,
+        })
+
+    rows.sort(key=lambda r: r["name"])
+    return rows, sorted(sectors)
+
+
 def build_site(
     companies: dict,
     search_index: list,
@@ -178,9 +278,17 @@ def build_site(
 
     search_json = json.dumps(search_index, separators=(",", ":"))
 
-    # Search page
-    t = env.get_template("search.html")
+    # Home page
+    t = env.get_template("home.html")
     (output_dir / "index.html").write_text(
+        t.render(build_date=build_date),
+        encoding="utf-8",
+    )
+
+    # Search page (moved from root to /search/)
+    (output_dir / "search").mkdir(exist_ok=True)
+    t = env.get_template("search.html")
+    (output_dir / "search" / "index.html").write_text(
         t.render(search_index_json=search_json, build_date=build_date),
         encoding="utf-8",
     )
@@ -190,6 +298,38 @@ def build_site(
     t = env.get_template("about.html")
     (output_dir / "about" / "index.html").write_text(
         t.render(build_date=build_date, company_count=len(companies)),
+        encoding="utf-8",
+    )
+
+    # Directory page
+    dir_rows, sectors = _build_directory_data(companies)
+    directory_json = json.dumps(dir_rows, separators=(",", ":"))
+    (output_dir / "directory").mkdir(exist_ok=True)
+    t = env.get_template("directory.html")
+    (output_dir / "directory" / "index.html").write_text(
+        t.render(
+            directory_json=directory_json,
+            sectors=sectors,
+            company_count=len(dir_rows),
+            build_date=build_date,
+        ),
+        encoding="utf-8",
+    )
+    print(f"  Directory: {len(dir_rows):,} companies, {len(directory_json):,} bytes")
+
+    # For companies page
+    (output_dir / "for-companies").mkdir(exist_ok=True)
+    t = env.get_template("for_companies.html")
+    (output_dir / "for-companies" / "index.html").write_text(
+        t.render(build_date=build_date),
+        encoding="utf-8",
+    )
+
+    # Methodology page
+    (output_dir / "methodology").mkdir(exist_ok=True)
+    t = env.get_template("methodology.html")
+    (output_dir / "methodology" / "index.html").write_text(
+        t.render(build_date=build_date),
         encoding="utf-8",
     )
 

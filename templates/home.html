@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}Good Business Pays — Great business partnerships grow the UK economy{% endblock %}
+
+{% block body %}
+<a class="gbp-skip" href="#main">Skip to content</a>
+
+<header class="gbp-site-header" data-theme="dark">
+  <div class="gbp-container gbp-site-header__inner">
+    <a class="gbp-site-header__logo" href="/" aria-label="Good Business Pays home">
+      <img src="/static/design-system/logos/gbp-logo-reversed.png" alt="Good Business Pays">
+    </a>
+    <nav class="gbp-site-header__nav" aria-label="Site">
+      <a href="/search/">Check a company</a>
+      <a href="/directory/">Directory</a>
+      <a href="/for-companies/">For companies</a>
+      <a href="/methodology/">How recognition works</a>
+      <a href="/about/">About the data</a>
+    </nav>
+  </div>
+</header>
+
+<section class="gbp-hero gbp-hero--wide" data-theme="dark">
+  <svg class="gbp-hero__ring" viewBox="0 0 380 380" aria-hidden="true"><circle cx="190" cy="190" r="150"></circle></svg>
+  <div class="gbp-container gbp-hero__inner" style="gap: 32px;">
+    <div class="gbp-hero__heading" style="max-width: 880px;">
+      <div class="gbp-ph"></div>
+      <h1 class="gbp-hl gbp-hl-m" style="font-size: 64px; line-height: 1.02; margin: 8px 0 0;">Great business <span class="gbp-kw">partnerships<svg class="gbp-under" viewBox="0 0 200 16" preserveAspectRatio="none"><path d="M3 10 C 40 5, 90 4, 130 6 S 185 9, 197 5" stroke-width="7" vector-effect="non-scaling-stroke"></path></svg></span> grow the UK economy.</h1>
+      <p class="gbp-hero-lede" style="margin-top: 24px;">We champion the relationships between UK businesses that drive innovation and growth: customers who pay promptly, treat suppliers fairly and are worth choosing.</p>
+    </div>
+    <form role="search" class="gbp-search" action="/search/" method="get">
+      <label for="hq" class="gbp-search-label">Is your next customer a good partner?</label>
+      <div class="gbp-search-pill">
+        <svg class="gbp-search-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+        <input id="hq" name="q" type="search" class="gbp-search-input" placeholder="Company name or number">
+        <button type="submit" class="gbp-search-btn">Check their record</button>
+      </div>
+      <div class="gbp-search-hint">See how over 10,000 large UK companies pay and treat their suppliers, from their own reports to government.</div>
+    </form>
+  </div>
+</section>
+
+<main id="main" class="gbp-main" data-theme="light">
+  <div class="gbp-container gbp-main__inner" style="gap: 72px;">
+
+    <section class="gbp-section" aria-labelledby="why">
+      <div class="gbp-ph">
+        <h2 id="why" class="gbp-ph-title">Why partnership matters</h2>
+        <div class="gbp-ph-meta">Small businesses supply the large ones. When those relationships work, both sides invest, innovate and grow.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;">
+        <section class="gbp-card" style="gap: 12px;">
+          <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#013825" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+          <h3 class="gbp-card-title">Pay promptly</h3>
+          <p class="gbp-card-note" style="margin: 0;">Cash flow is how small firms fund their next idea. We campaign for suppliers to be paid within 30 days.</p>
+        </section>
+        <section class="gbp-card" style="gap: 12px;">
+          <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#013825" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l4-4 4 3 4-4 4 4"></path><path d="M4 17h16"></path></svg>
+          <h3 class="gbp-card-title">Partner fairly</h3>
+          <p class="gbp-card-note" style="margin: 0;">Clear terms, simple invoicing and a named person to talk to. The practices that make a customer worth choosing.</p>
+        </section>
+        <section class="gbp-card" style="gap: 12px;">
+          <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#013825" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>
+          <h3 class="gbp-card-title">Grow together</h3>
+          <p class="gbp-card-note" style="margin: 0;">Supply chains that trust each other move faster. That is good for business and for the UK economy.</p>
+        </section>
+      </div>
+    </section>
+
+    <section class="gbp-section" aria-labelledby="rec">
+      <div class="gbp-ph">
+        <h2 id="rec" class="gbp-ph-title">Recognising the best partners</h2>
+        <div class="gbp-ph-meta">Recognition is earned from published data and independent assessment. It can't be bought.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: stretch;">
+        <section class="gbp-card" style="gap: 16px;">
+          <img src="/static/design-system/images/fast-payer-2026.png" alt="Fast Payer Award 2026" width="84" height="114">
+          <h3 class="gbp-card-title">Fast Payer Awards 2026</h3>
+          <p class="gbp-card-note" style="margin: 0;">The large UK companies paying their suppliers fastest, ranked from their own filings.</p>
+          <a href="/directory/" style="font-weight: 600; margin-top: auto;">See this year's winners</a>
+        </section>
+        <section class="gbp-coc" data-theme="dark" style="grid-template-columns: 1fr; gap: 16px; padding: 32px;">
+          <img class="gbp-seal" src="/static/design-system/images/customer-of-choice-seal-2026.png" alt="Certified Customer of Choice seal" width="114" height="114" style="width: 114px; height: 114px;">
+          <div>
+            <h3 style="color: #e2c172;">Certified Customer of Choice</h3>
+            <p>For Gold and Platinum Fast Payers who go further: assessed independently across 13 supplier practices.</p>
+            <a href="/for-companies/" style="display: inline-block; margin-top: 12px; font-weight: 600; color: #ffffff; text-decoration: underline; text-decoration-color: #d8b25c; text-underline-offset: 4px;">How certification works</a>
+          </div>
+        </section>
+        <section class="gbp-card" style="gap: 16px;">
+          <svg width="56" height="56" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#013825" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h12"></path></svg>
+          <h3 class="gbp-card-title">Good Business Partners directory</h3>
+          <p class="gbp-card-note" style="margin: 0;">A shortlist of customers worth choosing, for suppliers deciding who to work with.</p>
+          <a href="/directory/" style="font-weight: 600; margin-top: auto;">Browse the directory</a>
+        </section>
+      </div>
+    </section>
+
+    <section class="gbp-section" aria-labelledby="perf">
+      <div class="gbp-ph">
+        <h2 id="perf" class="gbp-ph-title">How businesses perform</h2>
+        <div class="gbp-ph-meta">Our research into who pays on time, and who doesn't.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px;">
+        <a class="gbp-card" href="/search/" style="text-decoration: none; gap: 8px;">
+          <h3 class="gbp-card-title">Search payment records</h3>
+          <span class="gbp-card-note" style="margin: 0;">Check how over 10,000 UK companies pay their suppliers.</span>
+        </a>
+        <a class="gbp-card" href="/directory/" style="text-decoration: none; gap: 8px;">
+          <span class="gbp-chip" style="align-self: flex-start;">2026</span>
+          <h3 class="gbp-card-title">Fast Payer Award winners</h3>
+          <span class="gbp-card-note" style="margin: 0;">The companies paying their suppliers fastest.</span>
+        </a>
+        <a class="gbp-card" href="/methodology/" style="text-decoration: none; gap: 8px;">
+          <h3 class="gbp-card-title">How recognition works</h3>
+          <span class="gbp-card-note" style="margin: 0;">How the payment score, awards and accreditation are calculated.</span>
+        </a>
+        <a class="gbp-card" href="/for-companies/" style="text-decoration: none; gap: 8px;">
+          <h3 class="gbp-card-title">Claim your profile</h3>
+          <span class="gbp-card-note" style="margin: 0;">Every large UK company already has a profile. Claim yours for free.</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="gbp-claim" aria-labelledby="co">
+      <div>
+        <h2 id="co">Is your business a good partner?</h2>
+        <p>Every large UK company already has a public payment profile. Claim yours for free and show suppliers everything that makes you a customer worth choosing.</p>
+        <ul>
+          <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Free to claim</li>
+          <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Start the Customer of Choice assessment</li>
+          <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Become a Good Business Partner</li>
+        </ul>
+      </div>
+      <a class="gbp-btn-solid" href="/for-companies/">Find your company</a>
+    </section>
+
+    <section class="gbp-section" aria-labelledby="sup">
+      <div class="gbp-ph">
+        <h2 id="sup" class="gbp-ph-title">Backed by Britain's business organisations</h2>
+      </div>
+      <ul style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; background: #d5ddd9; border: 1px solid #d5ddd9;">
+        <li style="background: #ffffff; padding: 28px 20px; font-weight: 600; text-align: center;">Federation of Small Businesses</li>
+        <li style="background: #ffffff; padding: 28px 20px; font-weight: 600; text-align: center;">Institute of Directors</li>
+        <li style="background: #ffffff; padding: 28px 20px; font-weight: 600; text-align: center;">CBI</li>
+        <li style="background: #ffffff; padding: 28px 20px; font-weight: 600; text-align: center;">British Chambers of Commerce</li>
+        <li style="background: #ffffff; padding: 28px 20px; font-weight: 600; text-align: center;">Small Business Commissioner</li>
+        <li style="background: #ffffff; padding: 28px 20px; font-weight: 600; text-align: center;">UK Finance</li>
+      </ul>
+    </section>
+
+  </div>
+</main>
+
+<section class="gbp-cta" data-theme="dark">
+  <div class="gbp-container gbp-cta__inner">
+    <h2 class="gbp-hl gbp-hl-m">Good business is paying today, so the economy can <span class="gbp-kw">grow<svg class="gbp-under" viewBox="0 0 200 16" preserveAspectRatio="none"><path d="M3 10 C 40 5, 90 4, 130 6 S 185 9, 197 5" stroke-width="7" vector-effect="non-scaling-stroke"></path></svg></span> tomorrow.</h2>
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div class="gbp-support">
+        <p>Over 50,000 SMEs close a year due to cash flow problems.</p>
+        <p>Join the businesses committed to paying suppliers within 30 days.</p>
+        <p class="gbp-ask">Make the 30-day pledge to show your support.</p>
+        <p class="gbp-tag">#GoodBusinessPays</p>
+      </div>
+      <div class="gbp-cta__actions">
+        <a href="https://www.goodbusinesspays.com/pledge" class="gbp-btn" rel="noopener">Make the pledge</a>
+        <a href="https://www.goodbusinesspays.com/pledge" rel="noopener">Get the monthly briefing</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="gbp-footer" data-theme="dark">
+  <div class="gbp-container gbp-footer__inner">
+    <img src="/static/design-system/logos/gbp-mark-green.png" alt="Good Business Pays">
+    <nav aria-label="Footer">
+      <a href="/about/">About the data</a>
+      <a href="/methodology/">How recognition works</a>
+      <a href="https://www.goodbusinesspays.com/privacy" rel="noopener">Privacy</a>
+      <a href="mailto:info@goodbusinesspays.com">Contact</a>
+    </nav>
+    <span class="gbp-footer__small">© Good Business Pays CIC</span>
+  </div>
+</footer>
+{% endblock %}

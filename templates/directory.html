@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Good Business Partners Directory — Customers worth choosing{% endblock %}
+
+{% block body %}
+<a class="gbp-skip" href="#main">Skip to the directory</a>
+
+<header class="gbp-site-header" data-theme="dark">
+  <div class="gbp-container gbp-site-header__inner">
+    <a class="gbp-site-header__logo" href="/" aria-label="Good Business Pays home">
+      <img src="/static/design-system/logos/gbp-logo-reversed.png" alt="Good Business Pays">
+    </a>
+    <nav class="gbp-site-header__nav" aria-label="Site">
+      <a href="/search/">Check a company</a>
+      <a href="/directory/">Directory</a>
+      <a href="/for-companies/">For companies</a>
+      <a href="/methodology/">How recognition works</a>
+      <a href="/about/">About the data</a>
+    </nav>
+  </div>
+</header>
+
+<section class="gbp-hero gbp-hero--wide" data-theme="dark">
+  <svg class="gbp-hero__ring" viewBox="0 0 380 380" aria-hidden="true"><circle cx="190" cy="190" r="150"></circle></svg>
+  <div class="gbp-container gbp-hero__inner">
+    <div class="gbp-hero__heading">
+      <div class="gbp-ph">
+        <div class="gbp-ph-eyebrow">Good Business Partners</div>
+        <h1 class="gbp-ph-title">Customers worth choosing</h1>
+      </div>
+      <p class="gbp-hero-lede">{{ company_count }} UK companies that have earned a Fast Payer Award from their own published payment data. Recognition is earned, never bought.</p>
+    </div>
+    <form role="search" class="gbp-search" action="/search/" method="get">
+      <label for="dq" class="gbp-search-label gbp-sr">Search for a company by name or number</label>
+      <div class="gbp-search-pill">
+        <input id="dq" name="q" type="search" class="gbp-search-input" placeholder="Company name or number">
+        <button type="submit" class="gbp-search-btn">Search</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<main id="main" class="gbp-main" data-theme="light">
+  <div class="gbp-container gbp-main__inner" style="gap: var(--space-6);">
+
+    <div class="gbp-dir-bar">
+      <label class="gbp-field" for="dir-sector">Sector
+        <select id="dir-sector" class="gbp-select">
+          <option value="">All sectors</option>
+          {% for sector in sectors %}
+          <option value="{{ sector }}">{{ sector }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <div class="gbp-field">Recognition
+        <div class="gbp-toggles">
+          <button type="button" class="gbp-toggle" data-band="" aria-pressed="true">All</button>
+          <button type="button" class="gbp-toggle" data-band="CoC" aria-pressed="false">Certified Customer of Choice</button>
+          <button type="button" class="gbp-toggle" data-band="Platinum" aria-pressed="false">Platinum</button>
+          <button type="button" class="gbp-toggle" data-band="Gold" aria-pressed="false">Gold</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="gbp-dir-bar" style="justify-content: space-between; align-items: center;">
+      <p class="gbp-results-count" style="margin:0;"></p>
+      <label class="gbp-field" style="flex-direction: row; align-items: center; gap: 12px;">Sort by
+        <select id="dir-sort" class="gbp-select">
+          <option value="avg">Fastest payment</option>
+          <option value="late">Fewest late payments</option>
+          <option value="az" selected>A to Z</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="gbp-dir" role="list">
+      <div class="gbp-dir-head" aria-hidden="true">
+        <span>Company</span>
+        <span>Average time to pay</span>
+        <span>Paid late</span>
+        <span>Recognition</span>
+        <span></span>
+      </div>
+      {# rows rendered by directory.js #}
+    </div>
+
+    <div class="gbp-pager"></div>
+
+    <p class="gbp-fair">Order is set only by the sort you choose. A company's profile level never changes its position, its ratings or its figures, which come from its filings under the UK payment practices reporting duty.</p>
+
+    <noscript><p style="padding: 24px 0; color: var(--ink-muted);">JavaScript is required to browse the directory. <a href="/search/">Use the search instead</a>.</p></noscript>
+
+  </div>
+</main>
+
+<section class="gbp-cta" data-theme="dark">
+  <div class="gbp-container gbp-cta__inner">
+    <h2 class="gbp-hl gbp-hl-m">Good business is paying today, so the economy can <span class="gbp-kw">grow<svg class="gbp-under" viewBox="0 0 200 16" preserveAspectRatio="none"><path d="M3 10 C 40 5, 90 4, 130 6 S 185 9, 197 5" stroke-width="7" vector-effect="non-scaling-stroke"></path></svg></span> tomorrow.</h2>
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div class="gbp-support">
+        <p>Over 50,000 SMEs close a year due to cash flow problems.</p>
+        <p>Join the businesses committed to paying suppliers within 30 days.</p>
+        <p class="gbp-ask">Make the 30-day pledge to show your support.</p>
+        <p class="gbp-tag">#GoodBusinessPays</p>
+      </div>
+      <div class="gbp-cta__actions">
+        <a href="https://www.goodbusinesspays.com/pledge" class="gbp-btn" rel="noopener">Make the pledge</a>
+        <a href="/for-companies/">Is this your company? Claim your profile</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="gbp-footer" data-theme="dark">
+  <div class="gbp-container gbp-footer__inner">
+    <img src="/static/design-system/logos/gbp-mark-green.png" alt="Good Business Pays">
+    <nav aria-label="Footer">
+      <a href="/about/">About the data</a>
+      <a href="/methodology/">How recognition works</a>
+      <a href="https://www.goodbusinesspays.com/privacy" rel="noopener">Privacy</a>
+      <a href="mailto:info@goodbusinesspays.com">Contact</a>
+    </nav>
+    <span class="gbp-footer__small">© Good Business Pays CIC</span>
+  </div>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+<script id="dir-data" type="application/json">{{ directory_json | safe }}</script>
+<script src="/static/directory.js"></script>
+{% endblock %}
