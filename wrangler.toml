@@ -9,7 +9,7 @@ compatibility_date = "2024-09-23"
 [[d1_databases]]
 binding      = "DB"
 database_name = "gbp-portal"
-database_id  = "REPLACE_WITH_D1_ID"   # wrangler d1 create gbp-portal
+database_id  = "7192e77d-5ead-4933-a201-6fbf97941839"   # wrangler d1 create gbp-portal
 
 [[r2_buckets]]
 binding     = "LOGOS"
