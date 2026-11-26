@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}Admin — Good Business Pays{% endblock %}
+
+{% block body %}
+<a class="gbp-skip" href="#main">Skip to content</a>
+
+<header class="gbp-site-header" data-theme="dark">
+  <div class="gbp-container gbp-site-header__inner">
+    <a class="gbp-site-header__logo" href="/" aria-label="Good Business Pays home">
+      <img src="/static/design-system/logos/gbp-logo-reversed.png" alt="Good Business Pays">
+    </a>
+    <nav class="gbp-site-header__nav" aria-label="Site">
+      <a href="/admin/" aria-current="page">Admin</a>
+      <a href="/search/">Check a company</a>
+    </nav>
+  </div>
+</header>
+
+<section class="gbp-hero" data-theme="dark">
+  <svg class="gbp-hero__ring" viewBox="0 0 380 380" aria-hidden="true"><circle cx="190" cy="190" r="150"></circle></svg>
+  <div class="gbp-container gbp-hero__inner">
+    <div class="gbp-hero__heading">
+      <div class="gbp-ph">
+        <div class="gbp-ph-eyebrow">Internal</div>
+        <h1 class="gbp-ph-title">Claim queue</h1>
+        <div class="gbp-ph-meta">Approve or reject incoming claim requests.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main id="main" class="gbp-main" data-theme="light">
+  <div class="gbp-container gbp-main__inner">
+
+    {# Token gate #}
+    <section class="gbp-section" id="auth-section" hidden>
+      <div class="gbp-ph">
+        <h2 class="gbp-ph-title">Enter admin token</h2>
+      </div>
+      <div style="display:flex;gap:12px;max-width:480px;">
+        <input id="admin-token-input" type="password" class="gbp-select" placeholder="Bearer token" style="flex:1;box-sizing:border-box;">
+        <button id="admin-token-btn" class="gbp-btn-solid">Load queue</button>
+      </div>
+      <p id="auth-error" hidden style="color:#c0392b;font-size:14px;margin-top:8px;"></p>
+    </section>
+
+    <section class="gbp-section" id="queue-section" hidden>
+      <div class="gbp-ph">
+        <h2 class="gbp-ph-title" id="pending-heading">Pending claims</h2>
+      </div>
+      <div id="pending-list">
+        <p style="color:var(--ink-muted);">Loading…</p>
+      </div>
+
+      <div class="gbp-ph" style="margin-top:48px;">
+        <h2 class="gbp-ph-title">Recent decisions</h2>
+      </div>
+      <div id="recent-list">
+        <p style="color:var(--ink-muted);">Loading…</p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="gbp-footer" data-theme="dark">
+  <div class="gbp-container gbp-footer__inner">
+    <img src="/static/design-system/logos/gbp-mark-green.png" alt="Good Business Pays">
+    <span class="gbp-footer__small">© Good Business Pays CIC</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var tokenKey = 'gbp_admin_token';
+  var token = '';
+
+  var authSection  = document.getElementById('auth-section');
+  var queueSection = document.getElementById('queue-section');
+  var tokenInput   = document.getElementById('admin-token-input');
+  var tokenBtn     = document.getElementById('admin-token-btn');
+  var authError    = document.getElementById('auth-error');
+
+  // Try stored token first
+  try { token = sessionStorage.getItem(tokenKey) || ''; } catch (e) {}
+  if (token) {
+    loadQueue();
+  } else {
+    authSection.hidden = false;
+  }
+
+  tokenBtn.addEventListener('click', function () {
+    token = tokenInput.value.trim();
+    if (!token) return;
+    try { sessionStorage.setItem(tokenKey, token); } catch (e) {}
+    authError.hidden = true;
+    loadQueue();
+  });
+
+  function loadQueue() {
+    fetch('/api/admin/claims', {
+      headers: { Authorization: 'Bearer ' + token },
+    })
+      .then(function (r) {
+        if (r.status === 403) throw new Error('Token rejected');
+        return r.json();
+      })
+      .then(function (data) {
+        authSection.hidden  = true;
+        queueSection.hidden = false;
+        renderPending(data.pending || []);
+        renderRecent(data.recent  || []);
+      })
+      .catch(function (err) {
+        authSection.hidden = false;
+        authError.textContent = err.message || 'Could not load queue.';
+        authError.hidden = false;
+        token = '';
+        try { sessionStorage.removeItem(tokenKey); } catch (e) {}
+      });
+  }
+
+  function renderPending(rows) {
+    var el = document.getElementById('pending-list');
+    var heading = document.getElementById('pending-heading');
+    heading.textContent = 'Pending claims (' + rows.length + ')';
+    if (!rows.length) {
+      el.innerHTML = '<p style="color:var(--ink-muted);">No pending claims.</p>';
+      return;
+    }
+    var html = '';
+    rows.forEach(function (r) {
+      html +=
+        '<section class="gbp-card" style="gap:12px;margin-bottom:16px;">' +
+          '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">' +
+            '<strong style="font-size:17px;">' + esc(r.company_name) + '</strong>' +
+            '<code style="font-size:13px;color:var(--ink-muted);">' + esc(r.company_number) + '</code>' +
+          '</div>' +
+          '<dl style="display:grid;grid-template-columns:120px 1fr;gap:4px 12px;font-size:14px;margin:0;">' +
+            '<dt style="color:var(--ink-muted);">Name</dt><dd style="margin:0;">' + esc(r.full_name) + '</dd>' +
+            '<dt style="color:var(--ink-muted);">Email</dt><dd style="margin:0;">' + esc(r.email) + '</dd>' +
+            '<dt style="color:var(--ink-muted);">Title</dt><dd style="margin:0;">' + esc(r.job_title) + '</dd>' +
+            '<dt style="color:var(--ink-muted);">Area</dt><dd style="margin:0;">' + esc(r.area) + '</dd>' +
+            '<dt style="color:var(--ink-muted);">Submitted</dt><dd style="margin:0;">' + esc(r.created_at) + '</dd>' +
+            '<dt style="color:var(--ink-muted);">Verified</dt><dd style="margin:0;">' + esc(r.verified_at || '—') + '</dd>' +
+          '</dl>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+            '<a href="/company/' + esc(r.company_number) + '/" target="_blank" style="font-size:14px;color:var(--ink-muted);text-decoration:underline;">View company page ↗</a>' +
+          '</div>' +
+          '<div style="display:flex;gap:12px;">' +
+            '<button class="gbp-btn-solid" data-action="approve" data-id="' + r.id + '" style="font-size:14px;">Approve</button>' +
+            '<button class="gbp-btn" data-action="reject"  data-id="' + r.id + '" style="font-size:14px;">Reject</button>' +
+          '</div>' +
+          '<div id="note-' + r.id + '" hidden>' +
+            '<textarea placeholder="Rejection note (optional)" style="width:100%;box-sizing:border-box;font-size:14px;font-family:inherit;border:1px solid var(--border,#ddd);border-radius:6px;padding:8px;" rows="2"></textarea>' +
+            '<button class="gbp-btn" data-action="confirm-reject" data-id="' + r.id + '" style="font-size:13px;margin-top:6px;">Confirm rejection</button>' +
+          '</div>' +
+        '</section>';
+    });
+    el.innerHTML = html;
+
+    el.querySelectorAll('[data-action=approve]').forEach(function (btn) {
+      btn.addEventListener('click', function () { decide(btn.dataset.id, 'approve', ''); });
+    });
+    el.querySelectorAll('[data-action=reject]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.getElementById('note-' + btn.dataset.id).hidden = false;
+        btn.disabled = true;
+      });
+    });
+    el.querySelectorAll('[data-action=confirm-reject]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var noteArea = document.getElementById('note-' + btn.dataset.id).querySelector('textarea');
+        decide(btn.dataset.id, 'reject', noteArea ? noteArea.value : '');
+      });
+    });
+  }
+
+  function renderRecent(rows) {
+    var el = document.getElementById('recent-list');
+    if (!rows.length) {
+      el.innerHTML = '<p style="color:var(--ink-muted);">No decisions yet.</p>';
+      return;
+    }
+    var html = '<table style="width:100%;font-size:14px;border-collapse:collapse;">' +
+      '<thead><tr style="text-align:left;border-bottom:2px solid var(--border,#eee);">' +
+        '<th style="padding:8px 12px 8px 0;">Company</th>' +
+        '<th style="padding:8px 12px;">Email</th>' +
+        '<th style="padding:8px 0 8px 12px;">Decision</th>' +
+      '</tr></thead><tbody>';
+    rows.forEach(function (r) {
+      html +=
+        '<tr style="border-bottom:1px solid var(--border,#f0f0f0);">' +
+          '<td style="padding:8px 12px 8px 0;"><a href="/company/' + esc(r.company_number) + '/">' + esc(r.company_name) + '</a></td>' +
+          '<td style="padding:8px 12px;">' + esc(r.email) + '</td>' +
+          '<td style="padding:8px 0 8px 12px;">' + (r.approved_at ? '✓ Approved' : '✗ Rejected') + '</td>' +
+        '</tr>';
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
+
+  function decide(id, action, note) {
+    fetch('/api/admin/claims', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
+      body: JSON.stringify({ claim_id: id, action: action, note: note }),
+    })
+      .then(function (r) { return r.json(); })
+      .then(function () { loadQueue(); })
+      .catch(function () { alert('Failed to save decision. Please try again.'); });
+  }
+
+  function esc(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+})();
+</script>
+{% endblock %}

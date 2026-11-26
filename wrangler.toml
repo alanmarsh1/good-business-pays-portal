@@ -1,0 +1,16 @@
+name = "good-business-pays-portal"
+pages_build_output_dir = "site"
+compatibility_date = "2024-09-23"
+
+# Run locally: npx wrangler pages dev site --d1=DB --r2=LOGOS
+# Secrets set via: npx wrangler pages secret put RESEND_API_KEY --project-name good-business-pays-portal
+# Secrets set via: npx wrangler pages secret put ADMIN_SECRET   --project-name good-business-pays-portal
+
+[[d1_databases]]
+binding      = "DB"
+database_name = "gbp-portal"
+database_id  = "REPLACE_WITH_D1_ID"   # wrangler d1 create gbp-portal
+
+[[r2_buckets]]
+binding     = "LOGOS"
+bucket_name = "gbp-logos"              # wrangler r2 bucket create gbp-logos

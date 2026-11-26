@@ -2,6 +2,7 @@ import json
 import shutil
 from datetime import date
 from pathlib import Path
+from urllib.parse import quote_plus
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from .config import TEMPLATES_DIR, STATIC_DIR, BENCHMARK_SCALE_MAX
 
@@ -264,6 +265,7 @@ def build_site(
     env.filters["fmt_pounds"] = _fmt_pounds
     env.filters["fmt_date"] = _fmt_date_long
     env.filters["fmt_date_short"] = _fmt_date_short
+    env.filters["urlencode"] = quote_plus
     env.globals["avg_marker_pos"] = _avg_marker_pos
     env.globals["late_marker_pos"] = _late_marker_pos
     env.globals["SCALE_MAX"] = BENCHMARK_SCALE_MAX
@@ -329,6 +331,22 @@ def build_site(
     (output_dir / "methodology").mkdir(exist_ok=True)
     t = env.get_template("methodology.html")
     (output_dir / "methodology" / "index.html").write_text(
+        t.render(build_date=build_date),
+        encoding="utf-8",
+    )
+
+    # Claim flow page
+    (output_dir / "claim").mkdir(exist_ok=True)
+    t = env.get_template("claim.html")
+    (output_dir / "claim" / "index.html").write_text(
+        t.render(build_date=build_date),
+        encoding="utf-8",
+    )
+
+    # Admin page (protected by Cloudflare Access in production)
+    (output_dir / "admin").mkdir(exist_ok=True)
+    t = env.get_template("admin.html")
+    (output_dir / "admin" / "index.html").write_text(
         t.render(build_date=build_date),
         encoding="utf-8",
     )

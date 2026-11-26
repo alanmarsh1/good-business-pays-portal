@@ -23,7 +23,7 @@
     <a class="gbp-site-header__logo" href="/" aria-label="Good Business Pays home">
       <img src="/static/design-system/logos/gbp-logo-reversed.png" alt="Good Business Pays">
     </a>
-    <form role="search" class="gbp-search gbp-search-sm" id="search-form" autocomplete="off" action="/" method="get">
+    <form role="search" class="gbp-search gbp-search-sm" id="search-form" autocomplete="off" action="/search/" method="get">
       <label for="q" class="gbp-search-label gbp-sr">Search for a company by name or number</label>
       <div class="gbp-search-pill">
         <input id="q" name="q" type="search" class="gbp-search-input" placeholder="Search company name or number" value="">
@@ -64,14 +64,14 @@
       <div style="margin-top:24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding:16px 20px;border:1px solid rgba(255,255,255,0.28);max-width:760px;">
         <span style="display:inline-flex;align-items:center;gap:8px;font-size:15px;line-height:22px;font-weight:600;color:#ffffff;"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#00ff7f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16.5v.5"></path></svg>Unclaimed profile</span>
         <span style="flex:1 1 260px;font-size:15px;line-height:22px;color:#b7cfc4;">Nobody from {{ c.company_name }} has added the company&#8217;s side of the story yet.</span>
-        <a class="gbp-btn" href="/claim/{{ c.company_number }}">Claim this profile, free</a>
+        <a class="gbp-btn" href="/claim/?n={{ c.company_number }}&amp;name={{ c.company_name | urlencode }}" data-unclaimed>Claim this profile, free</a>
       </div>
     </div>
   </div>
 </section>
 
 {# ── 3. Main ── #}
-<main id="main" class="gbp-main" data-theme="light">
+<main id="main" class="gbp-main" data-theme="light" data-company-number="{{ c.company_number }}">
   <div class="gbp-container gbp-main__inner">
 
 {# ── Recognition row (Fast Payer Award shields + Customer of Choice) ── #}
@@ -333,14 +333,14 @@
       {% set trend_pts = c.trend | selectattr("avg_days") | list %}
       {% if trend_pts | length > 1 %}
       {% set trend_max = trend_pts | map(attribute="avg_days") | max %}
-      <section class="gbp-card">
+      <section class="gbp-card" data-trend-card>
         <div class="gbp-card-head"><h3 class="gbp-card-title">Average days to pay over time</h3></div>
         <div class="gbp-trend">
           <div class="gbp-trend-plot" role="img"
                aria-label="Average days to pay by reporting period: {% for p in trend_pts %}{{ p.end_date | fmt_date_short }} {{ fmt_int(p.avg_days) }}{% if not loop.last %}, {% endif %}{% endfor %}"
                style="grid-template-columns: repeat({{ trend_pts | length }}, minmax(0px, 1fr));">
             {% for p in trend_pts %}
-            <div class="gbp-trend-col">
+            <div class="gbp-trend-col"{% if p.report_id %} data-report-id="{{ p.report_id }}"{% endif %}>
               <span class="gbp-trend-val">{{ fmt_int(p.avg_days) }}</span>
               <div class="gbp-trend-bar {{ 'gbp-s2' if loop.last else 'gbp-s1' }}" style="height: {{ (p.avg_days / trend_max * 140) | round | int }}px;"></div>
             </div>
@@ -404,7 +404,7 @@
           <li><svg class="gbp-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Start the Customer of Choice assessment when you are ready</li>
         </ul>
       </div>
-      <a class="gbp-btn-solid" href="/claim/{{ c.company_number }}">Claim this profile</a>
+      <a class="gbp-btn-solid" href="/claim/?n={{ c.company_number }}&amp;name={{ c.company_name | urlencode }}">Claim this profile</a>
     </section>
 
   </div>{# /gbp-main__inner #}
@@ -428,6 +428,8 @@
     </div>
   </div>
 </section>
+
+<script src="/static/profile.js"></script>
 
 {# ── Footer ── #}
 <footer class="gbp-footer" data-theme="dark">

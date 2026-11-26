@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% block title %}Claim your company profile — Good Business Pays{% endblock %}
+
+{% block body %}
+<a class="gbp-skip" href="#main">Skip to content</a>
+
+<header class="gbp-site-header" data-theme="dark">
+  <div class="gbp-container gbp-site-header__inner">
+    <a class="gbp-site-header__logo" href="/" aria-label="Good Business Pays home">
+      <img src="/static/design-system/logos/gbp-logo-reversed.png" alt="Good Business Pays">
+    </a>
+    <nav class="gbp-site-header__nav" aria-label="Site">
+      <a href="/search/">Check a company</a>
+      <a href="/directory/">Directory</a>
+      <a href="/for-companies/" aria-current="page">For companies</a>
+      <a href="/methodology/">How recognition works</a>
+      <a href="/about/">About the data</a>
+    </nav>
+  </div>
+</header>
+
+{# Progress bar — shown during active steps #}
+<div class="gbp-claim-progress" aria-label="Claim steps" role="list">
+  <div class="gbp-container">
+    <ol style="display:flex;gap:0;list-style:none;margin:0;padding:16px 0;counter-reset:step;">
+      <li data-progress-step="2" style="flex:1;text-align:center;font-size:13px;line-height:18px;padding:0 8px;">
+        <span style="display:block;font-weight:600;">1 · About you</span>
+      </li>
+      <li data-progress-step="3" style="flex:1;text-align:center;font-size:13px;line-height:18px;padding:0 8px;">
+        <span style="display:block;font-weight:600;">2 · Verify email</span>
+      </li>
+      <li data-progress-step="4" style="flex:1;text-align:center;font-size:13px;line-height:18px;padding:0 8px;">
+        <span style="display:block;font-weight:600;">3 · Your profile</span>
+      </li>
+      <li data-progress-step="5" style="flex:1;text-align:center;font-size:13px;line-height:18px;padding:0 8px;">
+        <span style="display:block;font-weight:600;">4 · Done</span>
+      </li>
+    </ol>
+  </div>
+</div>
+
+<main id="main" class="gbp-main" data-theme="light">
+  <div class="gbp-container gbp-main__inner" style="max-width:720px;">
+
+    {# ── Step 1: search ── #}
+    <div data-step="search">
+      <section class="gbp-section">
+        <div class="gbp-ph">
+          <div class="gbp-ph-eyebrow">Claim your profile</div>
+          <h1 class="gbp-ph-title">Find your company</h1>
+          <div class="gbp-ph-meta">Search by company name or Companies House number. Your profile is already here — it was built from your mandatory payment filings.</div>
+        </div>
+        <form id="claim-search-form" role="search" class="gbp-search" autocomplete="off">
+          <label for="claim-q" class="gbp-search-label gbp-sr">Search for a company</label>
+          <div class="gbp-search-pill">
+            <input id="claim-q" name="q" type="search" class="gbp-search-input" placeholder="Company name or Companies House number" autofocus>
+            <button type="submit" class="gbp-search-btn">Find my company</button>
+          </div>
+        </form>
+        <p style="margin-top:24px;font-size:14px;color:var(--ink-muted);">Not sure if your company files? <a href="/about/" style="color:inherit;text-decoration:underline;">Read about which companies must report.</a></p>
+      </section>
+    </div>
+
+    {# ── Step 2: about you ── #}
+    <div data-step="about" hidden>
+      <section class="gbp-section">
+        <div class="gbp-ph">
+          <div class="gbp-ph-eyebrow">Step 1 of 3 · Claiming <span data-co-name></span></div>
+          <h1 class="gbp-ph-title">About you</h1>
+          <div class="gbp-ph-meta">We use this to verify that you represent the company. It is not shown publicly.</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;align-items:start;">
+
+          <form id="claim-about-form" novalidate>
+            <p id="claim-about-error" class="gbp-field-error" hidden aria-live="polite" role="alert" style="color:#c0392b;font-size:14px;margin:0 0 16px;"></p>
+
+            <div class="gbp-field">
+              <label class="gbp-field-label" for="full_name">Full name <span aria-hidden="true">*</span></label>
+              <input class="gbp-select" id="full_name" name="full_name" type="text" autocomplete="name" required maxlength="120" style="width:100%;box-sizing:border-box;">
+            </div>
+
+            <div class="gbp-field">
+              <label class="gbp-field-label" for="job_title">Job title <span aria-hidden="true">*</span></label>
+              <input class="gbp-select" id="job_title" name="job_title" type="text" autocomplete="organization-title" required maxlength="120" style="width:100%;box-sizing:border-box;">
+            </div>
+
+            <div class="gbp-field">
+              <label class="gbp-field-label" for="email">Work email <span aria-hidden="true">*</span></label>
+              <input class="gbp-select" id="email" name="email" type="email" autocomplete="email" required maxlength="254" style="width:100%;box-sizing:border-box;">
+              <span class="gbp-field-hint">Must be on the company's own domain.</span>
+            </div>
+
+            <div class="gbp-field">
+              <label class="gbp-field-label" for="area">Your area <span aria-hidden="true">*</span></label>
+              <select class="gbp-select" id="area" name="area" required style="width:100%;box-sizing:border-box;">
+                <option value="">Choose one…</option>
+                <option>Finance and accounts payable</option>
+                <option>Procurement</option>
+                <option>Supplier relationships</option>
+                <option>Sustainability and ESG</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div class="gbp-field">
+              <label class="gbp-field-label" for="linkedin_url">LinkedIn profile <span style="font-weight:400;">(optional)</span></label>
+              <input class="gbp-select" id="linkedin_url" name="linkedin_url" type="url" autocomplete="url" maxlength="300" placeholder="https://www.linkedin.com/in/…" style="width:100%;box-sizing:border-box;">
+            </div>
+
+            <div class="gbp-field" style="display:flex;align-items:flex-start;gap:10px;">
+              <input type="checkbox" id="briefing_opt_in" name="briefing_opt_in" style="margin-top:3px;flex-shrink:0;">
+              <label for="briefing_opt_in" style="font-size:14px;line-height:20px;cursor:pointer;">
+                Send me the monthly Good Business Pays briefing — new filings and Fast Payer news. Unsubscribe at any time.
+              </label>
+            </div>
+
+            <button type="submit" class="gbp-btn-solid" style="margin-top:8px;">Next: check your email</button>
+          </form>
+
+          <aside class="gbp-card" style="font-size:14px;line-height:20px;gap:12px;">
+            <h2 style="font-size:16px;font-weight:700;margin:0;">Why we ask</h2>
+            <p style="margin:0;">We confirm that the email domain matches the company's registered details before the profile goes live. We do not share your personal details publicly.</p>
+            <p style="margin:0;">Multiple people can claim the same company. The profile is for the company, not for you personally.</p>
+            <p style="margin:0;"><a href="/methodology/#claiming" style="color:inherit;text-decoration:underline;">How the verification works</a></p>
+          </aside>
+
+        </div>
+      </section>
+    </div>
+
+    {# ── Step 3: check your email ── #}
+    <div data-step="check-email" hidden>
+      <section class="gbp-section">
+        <div class="gbp-ph">
+          <div class="gbp-ph-eyebrow">Step 2 of 3</div>
+          <h1 class="gbp-ph-title">Check your email</h1>
+          <div class="gbp-ph-meta">We've sent a confirmation link. Click it within 30 minutes to continue.</div>
+        </div>
+        <section class="gbp-card" style="max-width:480px;">
+          <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="var(--forest,#013825)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M2 7l10 7 10-7"></path></svg>
+          <div>
+            <h2 style="font-size:18px;font-weight:700;margin:0 0 8px;">Confirmation email sent</h2>
+            <p style="margin:0 0 8px;font-size:15px;line-height:22px;">Click the link in the email to confirm your address and move on to step 3. The link expires in 30 minutes.</p>
+            <p style="margin:0;font-size:14px;color:var(--ink-muted);">Can't find it? Check your spam folder. The email comes from noreply@goodbusinesspays.com.</p>
+          </div>
+        </section>
+        <div style="margin-top:24px;">
+          <a href="/for-companies/" style="font-size:14px;color:var(--ink-muted);text-decoration:underline;">Back to For companies</a>
+        </div>
+      </section>
+    </div>
+
+    {# ── Step 4: your profile ── #}
+    <div data-step="profile" hidden>
+      <section class="gbp-section">
+        <div class="gbp-ph">
+          <div class="gbp-ph-eyebrow">Step 3 of 3 · <a data-co-link href="#" style="color:inherit;text-decoration:underline;"><span data-co-name></span></a></div>
+          <h1 class="gbp-ph-title">Your profile</h1>
+          <div class="gbp-ph-meta">Help suppliers work with you. All fields are optional — you can edit this later. Your profile goes live after we review it, usually within one working day.</div>
+        </div>
+
+        <form id="claim-profile-form" novalidate>
+          <p id="claim-profile-error" class="gbp-field-error" hidden aria-live="polite" role="alert" style="color:#c0392b;font-size:14px;margin:0 0 16px;"></p>
+
+          <div class="gbp-field">
+            <label class="gbp-field-label" for="website">Company website</label>
+            <input class="gbp-select" id="website" name="website" type="url" placeholder="https://www.example.com" maxlength="300" style="width:100%;box-sizing:border-box;">
+            <span class="gbp-field-hint">Shown beside a "Claimed" verified mark on your public profile.</span>
+          </div>
+
+          <div class="gbp-field">
+            <label class="gbp-field-label" for="logo">Company logo <span style="font-weight:400;">(optional)</span></label>
+            <input id="logo" name="logo" type="file" accept="image/png,image/svg+xml" style="font-size:14px;">
+            <span class="gbp-field-hint">PNG or SVG, max 500 KB. Used on your Good Business Partner profile.</span>
+          </div>
+
+          <div class="gbp-field">
+            <label class="gbp-field-label" for="intro">Introduction <span style="font-weight:400;">(optional)</span></label>
+            <textarea class="gbp-select" id="intro" name="intro" rows="4" maxlength="600" placeholder="Briefly describe your company and what it means to be a good customer to your suppliers." style="width:100%;box-sizing:border-box;resize:vertical;font-family:inherit;font-size:14px;line-height:20px;"></textarea>
+            <span class="gbp-field-hint" id="intro-count">600 characters remaining</span>
+          </div>
+
+          <fieldset class="gbp-field" style="border:none;padding:0;margin:0;">
+            <legend class="gbp-field-label" style="margin-bottom:12px;">How to get paid <span style="font-weight:400;">(optional)</span></legend>
+
+            <div class="gbp-field">
+              <label class="gbp-field-label" for="getting_paid_rules" style="font-weight:400;">Invoicing rules</label>
+              <textarea class="gbp-select" id="getting_paid_rules" name="getting_paid_rules" rows="3" maxlength="600" placeholder="e.g. All invoices must include a PO number and be sent to ap@example.com." style="width:100%;box-sizing:border-box;resize:vertical;font-family:inherit;font-size:14px;line-height:20px;"></textarea>
+            </div>
+
+            <div class="gbp-field">
+              <label class="gbp-field-label" for="getting_paid_portal" style="font-weight:400;">Supplier portal URL</label>
+              <input class="gbp-select" id="getting_paid_portal" name="getting_paid_portal" type="url" placeholder="https://…" maxlength="300" style="width:100%;box-sizing:border-box;">
+            </div>
+
+            <div class="gbp-field">
+              <label class="gbp-field-label" for="getting_paid_email" style="font-weight:400;">Accounts payable email</label>
+              <input class="gbp-select" id="getting_paid_email" name="getting_paid_email" type="email" placeholder="ap@example.com" maxlength="254" style="width:100%;box-sizing:border-box;">
+            </div>
+          </fieldset>
+
+          <button type="submit" class="gbp-btn-solid" style="margin-top:8px;">Submit for review</button>
+          <p style="margin-top:12px;font-size:13px;color:var(--ink-muted);">Your figures and ratings are set by your government filings. Submitting a profile does not change them.</p>
+        </form>
+      </section>
+    </div>
+
+    {# ── Step 5: done ── #}
+    <div data-step="done" hidden>
+      <section class="gbp-section">
+        <div class="gbp-ph">
+          <h1 class="gbp-ph-title">Profile submitted</h1>
+          <div class="gbp-ph-meta">We'll review it and get it live within one working day.</div>
+        </div>
+        <section class="gbp-card" style="max-width:480px;">
+          <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="var(--forest,#013825)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="M22 4L12 14.01l-3-3"></path></svg>
+          <div>
+            <h2 style="font-size:18px;font-weight:700;margin:0 0 8px;">Profile submitted</h2>
+            <p style="margin:0 0 8px;font-size:15px;line-height:22px;">Once approved, a "Claimed" mark and your profile will appear on <a data-co-link href="#" style="color:inherit;font-weight:600;">your company page</a>. We'll notify you by email when it goes live.</p>
+            <p style="margin:0;font-size:14px;color:var(--ink-muted);">You can sign in again from any company page to edit your profile.</p>
+          </div>
+        </section>
+      </section>
+    </div>
+
+  </div>
+</main>
+
+<footer class="gbp-footer" data-theme="dark">
+  <div class="gbp-container gbp-footer__inner">
+    <img src="/static/design-system/logos/gbp-mark-green.png" alt="Good Business Pays">
+    <nav aria-label="Footer">
+      <a href="/about/">About the data</a>
+      <a href="/methodology/">How recognition works</a>
+      <a href="https://www.goodbusinesspays.com/privacy" rel="noopener">Privacy</a>
+      <a href="mailto:info@goodbusinesspays.com">Contact</a>
+    </nav>
+    <span class="gbp-footer__small">© Good Business Pays CIC</span>
+  </div>
+</footer>
+
+<script src="/static/claim.js"></script>
+{% endblock %}
