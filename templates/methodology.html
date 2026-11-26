@@ -56,7 +56,7 @@
       <div class="gbp-promise" style="margin-top: var(--space-6);">
         <div>
           <h3>How the score is calculated</h3>
-          <p>The three sub-scores (A1, A2, A3) are averaged to give the final payment score. The score is recalculated each time new filing data is published.</p>
+          <p>The three sub-scores (A1, A2, A3) are averaged and rounded to give the final payment score out of 100. The score is based on the company's two most recent filings.</p>
         </div>
         <div>
           <h3>Where the data comes from</h3>
@@ -67,6 +67,27 @@
           <p>Scores update whenever the government register publishes a new reporting period. Historical scores are preserved so you can see how a company has changed over time.</p>
         </div>
       </div>
+
+      <section class="gbp-card" style="margin-top: var(--space-6); gap: 16px;">
+        <h3 class="gbp-card-title">Speed scoring table (A1)</h3>
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border);">
+              <th style="text-align: left; padding: 8px 0; font-weight: 600;">Average days to pay</th>
+              <th style="text-align: right; padding: 8px 0; font-weight: 600;">A1 sub-score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px 0;">0 (immediate)</td><td style="text-align: right; padding: 8px 0;">100</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px 0;">10 days</td><td style="text-align: right; padding: 8px 0;">83</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px 0;">20 days</td><td style="text-align: right; padding: 8px 0;">67</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px 0;">30 days</td><td style="text-align: right; padding: 8px 0;">50</td></tr>
+            <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px 0;">40 days</td><td style="text-align: right; padding: 8px 0;">35</td></tr>
+            <tr><td style="padding: 8px 0;">50 days or more</td><td style="text-align: right; padding: 8px 0;">0</td></tr>
+          </tbody>
+        </table>
+        <p class="gbp-card-note" style="margin: 0;"><strong>Worked example:</strong> A company with 21-day average pay (A1 = 65), 91% paid within 30 days (A2 = 91), and 97% paid on time against 30-day terms (A3 = 85) scores (65 + 91 + 85) ÷ 3 = <strong>80 — Gold</strong>.</p>
+      </section>
     </section>
 
     <section class="gbp-section" aria-labelledby="bands">
@@ -108,20 +129,37 @@
       </div>
     </section>
 
+    <section class="gbp-section" aria-labelledby="bands-detail">
+      <div class="gbp-ph">
+        <h2 id="bands-detail" class="gbp-ph-title">Band stability and stale data</h2>
+        <div class="gbp-ph-meta">How bands are confirmed and what happens when filings are overdue.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+        <section class="gbp-card" style="gap: 12px;">
+          <h3 class="gbp-card-title">Band confirmation schedule</h3>
+          <p class="gbp-card-note" style="margin: 0;">Bands are confirmed on <strong>30 November</strong> and <strong>31 May</strong> each year. A company moves down a band only after two consecutive filings below the threshold, so a single bad period does not immediately change a company's standing.</p>
+        </section>
+        <section class="gbp-card" style="gap: 12px;">
+          <h3 class="gbp-card-title">Stale filings</h3>
+          <p class="gbp-card-note" style="margin: 0;">If a company's latest filing is more than 12 months old, its profile shows "Awaiting new data" and retains its current band until the next review. Companies that fall below the floor threshold (score under 50) for two consecutive filings are removed from the Good Business Partners directory at the next review.</p>
+        </section>
+      </div>
+    </section>
+
     <section class="gbp-section" aria-labelledby="accreditation">
       <div class="gbp-ph">
-        <h2 id="accreditation" class="gbp-ph-title">Accreditation and Customer of Choice</h2>
+        <h2 id="accreditation" class="gbp-ph-title">Customer of Choice certification</h2>
         <div class="gbp-ph-meta">The step beyond the award, for companies that want independent proof of how they treat suppliers.</div>
       </div>
       <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
         <section class="gbp-card" style="gap: 12px;">
           <img src="/static/design-system/images/customer-of-choice-seal-2026.png" alt="Certified Customer of Choice seal" width="80" height="80">
-          <h3 class="gbp-card-title">Customer of Choice diagnostic</h3>
-          <p class="gbp-card-note" style="margin: 0;">Gold and Platinum Fast Payers who want full accreditation complete the Customer of Choice diagnostic: an independent assessment of 13 supplier practices covering everything from payment terms to communication and invoicing simplicity.</p>
+          <h3 class="gbp-card-title">The five stages</h3>
+          <p class="gbp-card-note" style="margin: 0;">The independent assessment places companies on one of five stages: <strong>Transactional Buyer</strong>, <strong>Operationally Competent</strong>, <strong>Trusted Partner</strong>, <strong>Preferred Customer</strong>, <strong>Customer of Choice</strong>. The top three stages earn certification, which lasts 12 months.</p>
         </section>
         <section class="gbp-card" style="gap: 12px;">
-          <h3 class="gbp-card-title">What accreditation covers</h3>
-          <p class="gbp-card-note" style="margin: 0;">Accredited Good Business Partners have passed the diagnostic, carried a supplier survey, and had their credentials independently reviewed. The accreditation is annual and must be renewed. It cannot be bought without the diagnostic.</p>
+          <h3 class="gbp-card-title">The diagnostic covers 13 practices</h3>
+          <p class="gbp-card-note" style="margin: 0;">Gold and Platinum Fast Payers complete the Customer of Choice diagnostic: an independent assessment covering four areas — financial practices, operational practices, supplier voice and fairness, and culture and learning. The accreditation is annual and must be renewed. It cannot be bought without completing the diagnostic.</p>
         </section>
       </div>
     </section>
