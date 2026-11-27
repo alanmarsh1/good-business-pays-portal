@@ -70,7 +70,7 @@ a:hover { color: var(--deep); }
 
 /* Analysis dropdown in site nav */
 .gbp-nav-drop { position: relative; }
-.gbp-nav-drop__btn { background: none; border: none; padding: 0; cursor: pointer; font: inherit; font-size: 15px; font-weight: 600; color: inherit; display: inline-flex; align-items: center; gap: 5px; }
+.gbp-nav-drop__btn { background: none; border: none; padding: 0; cursor: pointer; font: inherit; font-size: 15px; font-weight: 600; color: var(--white); display: inline-flex; align-items: center; gap: 5px; }
 .gbp-nav-drop__btn:hover { text-decoration: underline; text-underline-offset: 3px; }
 .gbp-nav-drop__chevron { width: 10px; height: 7px; flex-shrink: 0; }
 .gbp-nav-drop__menu { position: absolute; top: calc(100% + 10px); left: -12px; min-width: 196px; background: var(--forest); border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 6px; display: none; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
