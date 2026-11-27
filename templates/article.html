@@ -23,10 +23,12 @@
 <section class="gbp-hero" data-theme="dark">
   <svg class="gbp-hero__ring" viewBox="0 0 380 380" aria-hidden="true"><circle cx="190" cy="190" r="150"></circle></svg>
   <div class="gbp-container gbp-hero__inner">
-    <a class="gbp-back" href="/news/">
+    {% if back_url %}
+    <a class="gbp-back" href="{{ back_url }}">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>
-      News
+      {{ back_label | default("Back") }}
     </a>
+    {% endif %}
     <div class="gbp-hero__heading">
       <div class="gbp-ph">
         {% if article.categories %}

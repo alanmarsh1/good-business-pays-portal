@@ -37,7 +37,7 @@
     <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border);">
       {% for post in articles %}
       <li style="background: var(--surface);">
-        <a href="/news/{{ post.slug }}/" style="display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; padding: 24px; text-decoration: none; color: inherit;">
+        <a href="/posts/{{ post.slug }}/" style="display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; padding: 24px; text-decoration: none; color: inherit;">
           <div style="display: flex; flex-direction: column; gap: 8px;">
             {% if post.categories %}
             <span class="gbp-chip" style="align-self: flex-start;">{{ post.categories[0] }}</span>

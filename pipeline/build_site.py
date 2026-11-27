@@ -240,16 +240,16 @@ def _build_directory_data(companies: dict) -> tuple[list[dict], list[str]]:
     return rows, sorted(sectors)
 
 
-def _load_articles(content_dir: Path) -> list[dict]:
-    """Load and parse all Markdown files from content/news/, sorted newest first."""
-    _md = markdown.Markdown(extensions=["tables", "fenced_code"])
-    articles = []
-    news_dir = content_dir / "news"
-    if not news_dir.exists():
-        return articles
-    for path in sorted(news_dir.glob("*.md"), reverse=True):
+_MD_PARSER = markdown.Markdown(extensions=["tables", "fenced_code"])
+
+
+def _load_md_dir(directory: Path) -> list[dict]:
+    """Load all .md files from a directory, return list sorted by filename desc."""
+    items = []
+    if not directory.exists():
+        return items
+    for path in sorted(directory.glob("*.md"), reverse=True):
         text = path.read_text(encoding="utf-8")
-        # Split YAML front matter from body
         m = re.match(r"^---\n(.+?)\n---\n?(.*)", text, re.DOTALL)
         if not m:
             continue
@@ -258,18 +258,28 @@ def _load_articles(content_dir: Path) -> list[dict]:
         except yaml.YAMLError:
             continue
         body_md = m.group(2).strip()
-        _md.reset()
-        body_html = _md.convert(body_md)
-        article = dict(meta)
-        article["body_html"] = body_html
-        # Human-readable date
+        _MD_PARSER.reset()
+        item = dict(meta)
+        item["body_html"] = _MD_PARSER.convert(body_md)
         raw_date = str(meta.get("date", ""))
         try:
-            article["date_display"] = date.fromisoformat(raw_date).strftime("%-d %B %Y")
+            item["date_display"] = date.fromisoformat(raw_date).strftime("%-d %B %Y")
         except (ValueError, TypeError):
-            article["date_display"] = raw_date
-        articles.append(article)
-    return articles
+            item["date_display"] = raw_date
+        item["_source_slug"] = path.stem  # filename stem, used for path mapping
+        items.append(item)
+    return items
+
+
+# Pages whose slug alone doesn't give the correct URL path (nested WordPress URLs)
+_PAGE_PATH_MAP: dict[str, str] = {
+    "our-partners": "about/our-partners",
+    "our-people": "about/our-people",
+    "sector-analysis": "how-businesses-perform/sector-analysis",
+    "standard-terms-and-conditions-for-suppliers": (
+        "about/policies/standard-terms-and-conditions-for-suppliers"
+    ),
+}
 
 
 def build_site(
@@ -386,27 +396,103 @@ def build_site(
         encoding="utf-8",
     )
 
-    # News listing and article pages
-    articles = _load_articles(CONTENT_DIR)
-    if articles:
-        (output_dir / "news").mkdir(exist_ok=True)
-        t = env.get_template("news.html")
-        (output_dir / "news" / "index.html").write_text(
-            t.render(articles=articles, build_date=build_date),
+    # ── Article template (reused across all content types) ──────────────────
+    t_art = env.get_template("article.html")
+
+    def _write_article(article: dict, url_path: str, back_url: str, back_label: str) -> None:
+        out = output_dir / url_path
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "index.html").write_text(
+            t_art.render(
+                article=article,
+                back_url=back_url,
+                back_label=back_label,
+                build_date=build_date,
+            ),
             encoding="utf-8",
         )
-        t_art = env.get_template("article.html")
+
+    # ── News: listing at /news/, articles at /posts/{slug}/ ─────────────────
+    # WordPress URL for posts was /posts/{slug}/ — keep listing at /news/ page
+    articles = _load_md_dir(CONTENT_DIR / "news")
+    redirects: list[str] = []
+    if articles:
+        (output_dir / "news").mkdir(exist_ok=True)
+        t_news = env.get_template("news.html")
+        (output_dir / "news" / "index.html").write_text(
+            t_news.render(articles=articles, build_date=build_date),
+            encoding="utf-8",
+        )
         for art in articles:
             slug = art.get("slug", "")
             if not slug:
                 continue
-            art_dir = output_dir / "news" / slug
-            art_dir.mkdir(exist_ok=True)
-            (art_dir / "index.html").write_text(
-                t_art.render(article=art, build_date=build_date),
-                encoding="utf-8",
-            )
-        print(f"  News: {len(articles)} articles")
+            _write_article(art, f"posts/{slug}", "/news/", "News")
+            # Redirect /news/{slug}/ → /posts/{slug}/ for any existing bookmarks
+            redirects.append(f"/news/{slug}/ /posts/{slug}/ 301")
+        print(f"  News: {len(articles)} articles at /posts/{{slug}}/")
+
+    # ── Watchlist: each edition at /{slug}/ (WordPress root-level pages) ────
+    watchlist = _load_md_dir(CONTENT_DIR / "watchlist")
+    for page in watchlist:
+        slug = page.get("slug", "")
+        if not slug:
+            continue
+        _write_article(page, slug, "/", "Home")
+    if watchlist:
+        print(f"  Watchlist: {len(watchlist)} editions")
+
+    # ── Sector analysis: /how-businesses-perform/sector-analysis/{slug}/ ────
+    analysis = _load_md_dir(CONTENT_DIR / "analysis")
+    for page in analysis:
+        slug = page.get("slug", "")
+        if not slug:
+            continue
+        _write_article(
+            page,
+            f"how-businesses-perform/sector-analysis/{slug}",
+            "/how-businesses-perform/sector-analysis/",
+            "Sector analysis",
+        )
+    # Redirect /how-businesses-perform/ → listing page
+    redirects.append("/how-businesses-perform/ /how-businesses-perform/sector-analysis/ 301")
+    if analysis:
+        print(f"  Sector analysis: {len(analysis)} pages")
+
+    # ── Supporters: /the-village-of-solutions/{slug}/ ────────────────────────
+    supporters = _load_md_dir(CONTENT_DIR / "supporters")
+    (output_dir / "the-village-of-solutions").mkdir(exist_ok=True)
+    for page in supporters:
+        slug = page.get("slug", "")
+        if not slug:
+            continue
+        _write_article(
+            page,
+            f"the-village-of-solutions/{slug}",
+            "/about/our-partners/",
+            "Our partners",
+        )
+    if supporters:
+        print(f"  Supporters: {len(supporters)} pages")
+
+    # ── Standard pages at their WordPress paths ───────────────────────────────
+    # Skip pages that have dedicated templates (home, about, search, etc.)
+    _SKIP_PAGE_SLUGS = {"about", "sample-page", "home"}
+    std_pages = _load_md_dir(CONTENT_DIR / "pages")
+    for page in std_pages:
+        file_slug = page.get("_source_slug", "")
+        if not file_slug or file_slug in _SKIP_PAGE_SLUGS:
+            continue
+        slug = page.get("slug", file_slug)
+        url_path = _PAGE_PATH_MAP.get(slug, slug)
+        _write_article(page, url_path, "/", "Home")
+    if std_pages:
+        print(f"  Standard pages: {len(std_pages)} pages")
+
+    # ── _redirects for Cloudflare Pages ──────────────────────────────────────
+    if redirects:
+        (output_dir / "_redirects").write_text("\n".join(redirects) + "\n", encoding="utf-8")
+        print(f"  Redirects: {len(redirects)} rules")
 
     # Company pages
     company_root = output_dir / "company"
