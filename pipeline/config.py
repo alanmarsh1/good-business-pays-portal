@@ -6,6 +6,7 @@ DATA_DIR = ROOT / "data"
 TEMPLATES_DIR = ROOT / "templates"
 STATIC_DIR = ROOT / "static"
 LOGS_DIR = ROOT / "logs"
+CONTENT_DIR = ROOT / "content"
 
 EXPORT_URL = "https://check-payment-practices.service.gov.uk/download/all-reports/csv"
 CH_SNAPSHOT_BASE_URL = "https://download.companieshouse.gov.uk"

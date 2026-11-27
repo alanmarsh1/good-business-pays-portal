@@ -1,10 +1,13 @@
 import json
+import re
 import shutil
 from datetime import date
 from pathlib import Path
 from urllib.parse import quote_plus
+import markdown
+import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from .config import TEMPLATES_DIR, STATIC_DIR, BENCHMARK_SCALE_MAX
+from .config import TEMPLATES_DIR, STATIC_DIR, BENCHMARK_SCALE_MAX, CONTENT_DIR
 
 
 def _fmt_pounds(v) -> str | None:
@@ -237,6 +240,38 @@ def _build_directory_data(companies: dict) -> tuple[list[dict], list[str]]:
     return rows, sorted(sectors)
 
 
+def _load_articles(content_dir: Path) -> list[dict]:
+    """Load and parse all Markdown files from content/news/, sorted newest first."""
+    _md = markdown.Markdown(extensions=["tables", "fenced_code"])
+    articles = []
+    news_dir = content_dir / "news"
+    if not news_dir.exists():
+        return articles
+    for path in sorted(news_dir.glob("*.md"), reverse=True):
+        text = path.read_text(encoding="utf-8")
+        # Split YAML front matter from body
+        m = re.match(r"^---\n(.+?)\n---\n?(.*)", text, re.DOTALL)
+        if not m:
+            continue
+        try:
+            meta = yaml.safe_load(m.group(1)) or {}
+        except yaml.YAMLError:
+            continue
+        body_md = m.group(2).strip()
+        _md.reset()
+        body_html = _md.convert(body_md)
+        article = dict(meta)
+        article["body_html"] = body_html
+        # Human-readable date
+        raw_date = str(meta.get("date", ""))
+        try:
+            article["date_display"] = date.fromisoformat(raw_date).strftime("%-d %B %Y")
+        except (ValueError, TypeError):
+            article["date_display"] = raw_date
+        articles.append(article)
+    return articles
+
+
 def build_site(
     companies: dict,
     search_index: list,
@@ -350,6 +385,28 @@ def build_site(
         t.render(build_date=build_date),
         encoding="utf-8",
     )
+
+    # News listing and article pages
+    articles = _load_articles(CONTENT_DIR)
+    if articles:
+        (output_dir / "news").mkdir(exist_ok=True)
+        t = env.get_template("news.html")
+        (output_dir / "news" / "index.html").write_text(
+            t.render(articles=articles, build_date=build_date),
+            encoding="utf-8",
+        )
+        t_art = env.get_template("article.html")
+        for art in articles:
+            slug = art.get("slug", "")
+            if not slug:
+                continue
+            art_dir = output_dir / "news" / slug
+            art_dir.mkdir(exist_ok=True)
+            (art_dir / "index.html").write_text(
+                t_art.render(article=art, build_date=build_date),
+                encoding="utf-8",
+            )
+        print(f"  News: {len(articles)} articles")
 
     # Company pages
     company_root = output_dir / "company"

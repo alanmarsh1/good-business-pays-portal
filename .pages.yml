@@ -1,0 +1,71 @@
+backend:
+  name: github
+  repo: alanmarsh/goodbusinesspays
+  branch: main
+
+media_folder: static/uploads
+public_folder: /static/uploads
+
+collections:
+  - name: news
+    label: News
+    label_singular: Article
+    folder: content/news
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: date, label: Date, widget: date, format: YYYY-MM-DD }
+      - { name: slug, label: Slug, widget: string }
+      - name: categories
+        label: Categories
+        widget: select
+        multiple: true
+        options:
+          - Campaign update
+          - How-to
+          - In the news
+          - Local authority
+          - Press release
+          - Supporters
+          - Thought leadership
+      - { name: summary, label: Summary, widget: text, required: false }
+      - { name: featured_image, label: Featured image URL, widget: string, required: false }
+      - { name: body, label: Body, widget: markdown }
+
+  - name: pages
+    label: Pages
+    label_singular: Page
+    folder: content/pages
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: date, label: Date, widget: date, format: YYYY-MM-DD }
+      - { name: slug, label: Slug, widget: string }
+      - { name: body, label: Body, widget: markdown }
+
+  - name: watchlist
+    label: Watchlist
+    label_singular: Edition
+    folder: content/watchlist
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: date, label: Date, widget: date, format: YYYY-MM-DD }
+      - { name: edition, label: Edition, widget: string }
+      - { name: slug, label: Slug, widget: string }
+      - { name: body, label: Body, widget: markdown }
+
+  - name: analysis
+    label: Sector Analysis
+    label_singular: Sector
+    folder: content/analysis
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: date, label: Date, widget: date, format: YYYY-MM-DD }
+      - { name: slug, label: Slug, widget: string }
+      - { name: body, label: Body, widget: markdown }
